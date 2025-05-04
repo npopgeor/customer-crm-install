@@ -9,6 +9,7 @@ from datetime import date
 from dotenv import load_dotenv
 import os
 import re
+import logging
 
 #os.makedirs('backup', exist_ok=True)
 
@@ -27,6 +28,8 @@ app = Flask(__name__)
 
 # === Load Environment ===
 load_dotenv()
+
+DEVICE_NAME = os.environ.get("DEVICE_NAME", "UNKNOWN_DEVICE")
 
 ONEDRIVE_PATH = os.environ.get("ONEDRIVE_PATH")
 DATABASE_PATH = os.environ.get("DATABASE_PATH")
@@ -49,6 +52,16 @@ os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DATABASE_PATH}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+CHANGE_LOG_FILE = os.path.join(os.environ.get("ONEDRIVE_PATH", "."), "APP", "change_log.txt")
+logging.basicConfig(
+    filename=CHANGE_LOG_FILE,
+    level=logging.INFO,
+    format="%(asctime)s — %(message)s",
+)
+
+def log_change(action: str, target: str):
+    logging.info(f"[{DEVICE_NAME}] {action} → {target}")
 
 
 db = SQLAlchemy(app)
@@ -966,6 +979,9 @@ def delete_partner(partner_id):
     return redirect(url_for('partner_list'))
 
 # --- CUSTOMER ROUTES ---
+# --- CUSTOMER ROUTES ---
+# --- CUSTOMER ROUTES ---
+
 
 
 @app.route('/customers')
@@ -1168,6 +1184,81 @@ def customer_attachments(id):
         safe_customer_name=secure_folder_name(customer.name)
     )
 
+# --- Customer Opportunities ---
+@app.route('/customers/<int:customer_id>/add_opportunity', methods=['POST'])
+def add_customer_opportunity(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    title = request.form['title']
+    value = request.form.get('value')
+    stage = request.form.get('stage')
+    notes = request.form.get('notes')
+
+    new_opp = CustomerOpportunity(customer_id=customer.id, title=title, value=value, stage=stage, notes=notes)
+    db.session.add(new_opp)
+    db.session.commit()
+    return redirect(url_for('customer_detail', id=customer.id))
+
+
+# --- Customer Technologies ---
+@app.route('/customers/<int:customer_id>/add_technology', methods=['POST'])
+def add_customer_technology(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    name = request.form['name']
+    discount_level = request.form.get('discount_level', type=int)
+    notes = request.form.get('notes')
+
+    new_tech = CustomerTechnology(customer_id=customer.id, name=name, discount_level=discount_level, notes=notes)
+    db.session.add(new_tech)
+    db.session.commit()
+    return redirect(url_for('customer_detail', id=customer.id))
+
+
+# --- Customer Projects ---
+@app.route('/customers/<int:customer_id>/add_project', methods=['POST'])
+def add_customer_project(customer_id):
+    customer = Customer.query.get_or_404(customer_id)
+    name = request.form['name']
+    status = request.form.get('status')
+    owner = request.form.get('owner')
+    notes = request.form.get('notes')
+
+    new_proj = CustomerProject(customer_id=customer.id, name=name, status=status, owner=owner, notes=notes)
+    db.session.add(new_proj)
+    db.session.commit()
+    return redirect(url_for('customer_detail', id=customer.id))
+
+@app.route('/customers/delete_file/<int:file_id>', methods=['POST'])
+def delete_customer_file(file_id):
+    doc = DivisionDocument.query.get_or_404(file_id)
+    full_path = os.path.abspath(os.path.join(app.config['UPLOAD_FOLDER'], doc.filename))
+
+    if not full_path.startswith(os.path.abspath(app.config['UPLOAD_FOLDER'])):
+        abort(403)
+
+    try:
+        if os.path.exists(full_path):
+            os.remove(full_path)
+            print(f"🗑️ Deleted file: {full_path}")
+    except Exception as e:
+        print(f"⚠️ Error deleting file: {e}")
+
+    db.session.delete(doc)
+    db.session.commit()
+
+    open_folder = request.args.get('open')
+    ref = request.form.get('referer') or request.referrer or url_for('customer_list')
+    if open_folder and ref:
+        # Remove existing ? or &open=... from the ref
+        ref = ref.split('?')[0]
+        return redirect(f"{ref}?open={open_folder}")
+    return redirect(ref or url_for('customer_list'))
+
+
+
+# --- DIVISION ROUTES ---
+# --- DIVISION ROUTES ---
+# --- DIVISION ROUTES ---
+
 
 
 @app.route('/divisions/add/<int:customer_id>', methods=['GET', 'POST'])
@@ -1249,56 +1340,6 @@ def delete_division_route(division_id):
     if from_tab == "setup":
         return redirect(url_for('customer_detail', id=customer_id) + '#setup')
     return redirect(url_for('customer_detail', id=customer_id))
-
-# --- Customer Opportunities ---
-@app.route('/customers/<int:customer_id>/add_opportunity', methods=['POST'])
-def add_customer_opportunity(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
-    title = request.form['title']
-    value = request.form.get('value')
-    stage = request.form.get('stage')
-    notes = request.form.get('notes')
-
-    new_opp = CustomerOpportunity(customer_id=customer.id, title=title, value=value, stage=stage, notes=notes)
-    db.session.add(new_opp)
-    db.session.commit()
-    return redirect(url_for('customer_detail', id=customer.id))
-
-
-# --- Customer Technologies ---
-@app.route('/customers/<int:customer_id>/add_technology', methods=['POST'])
-def add_customer_technology(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
-    name = request.form['name']
-    discount_level = request.form.get('discount_level', type=int)
-    notes = request.form.get('notes')
-
-    new_tech = CustomerTechnology(customer_id=customer.id, name=name, discount_level=discount_level, notes=notes)
-    db.session.add(new_tech)
-    db.session.commit()
-    return redirect(url_for('customer_detail', id=customer.id))
-
-
-# --- Customer Projects ---
-@app.route('/customers/<int:customer_id>/add_project', methods=['POST'])
-def add_customer_project(customer_id):
-    customer = Customer.query.get_or_404(customer_id)
-    name = request.form['name']
-    status = request.form.get('status')
-    owner = request.form.get('owner')
-    notes = request.form.get('notes')
-
-    new_proj = CustomerProject(customer_id=customer.id, name=name, status=status, owner=owner, notes=notes)
-    db.session.add(new_proj)
-    db.session.commit()
-    return redirect(url_for('customer_detail', id=customer.id))
-
-
-
-
-# --- DIVISION ROUTES ---
-# --- DIVISION ROUTES ---
-# --- DIVISION ROUTES ---
 
 
 @app.route('/divisions/<int:division_id>/opportunities/add', methods=['GET', 'POST'])
@@ -1483,31 +1524,9 @@ def uploaded_file(filename):
 from datetime import datetime
 
 
-@app.route('/customers/delete_file/<int:file_id>', methods=['POST'])
-def delete_customer_file(file_id):
-    doc = DivisionDocument.query.get_or_404(file_id)
-    full_path = os.path.abspath(os.path.join(app.config['UPLOAD_FOLDER'], doc.filename))
-
-    if not full_path.startswith(os.path.abspath(app.config['UPLOAD_FOLDER'])):
-        abort(403)
-
-    try:
-        if os.path.exists(full_path):
-            os.remove(full_path)
-            print(f"🗑️ Deleted file: {full_path}")
-    except Exception as e:
-        print(f"⚠️ Error deleting file: {e}")
-
-    db.session.delete(doc)
-    db.session.commit()
-
-    open_folder = request.args.get('open')
-    ref = request.form.get('referer') or request.referrer or url_for('customer_list')
-    if open_folder and ref:
-        # Remove existing ? or &open=... from the ref
-        ref = ref.split('?')[0]
-        return redirect(f"{ref}?open={open_folder}")
-    return redirect(ref or url_for('customer_list'))
+# --- ACTION ITEM ROUTES ---
+# --- ACTION ITEM ROUTES ---
+# --- ACTION ITEM ROUTES ---
 
 @app.route('/action_items')
 def action_item_list():
@@ -1557,10 +1576,11 @@ def add_action_item():
             customer_contact=request.form['customer_contact'],
             cisco_contact=request.form['cisco_contact'],
             completed='completed' in request.form,
-            category=request.form.get('category', 'daily')  # ✅ New field with default fallback
+            category=request.form.get('category', 'daily')
         )
         db.session.add(item)
         db.session.commit()
+        log_change("Added action item", f"{item.detail} (Customer ID: {item.customer_id})")
         return redirect(url_for('action_item_list', tab=item.category))
     
     customers = Customer.query.all()
@@ -1701,7 +1721,9 @@ def export_action_items_csv():
         download_name=filename
     )
 
-
+# --- MEETINGS ROUTES ---
+# --- MEETINGS ROUTES ---
+# --- MEETINGS ROUTES ---
 
 
 @app.route('/meetings')
@@ -1785,6 +1807,11 @@ def delete_meeting(meeting_id):
     db.session.delete(meeting)
     db.session.commit()
     return redirect(url_for('meeting_list'))
+
+
+# --- RECURRING MEETINGS ROUTES ---
+# --- RECURRING MEETINGS ROUTES ---
+# --- RECURRING MEETINGS ROUTES ---
 
 
 @app.route('/recurring_meetings')
@@ -1971,6 +1998,10 @@ def download_recurring_ics(meeting_id):
         download_name=f"{meeting.title.replace(' ', '_')}.ics"
     )
 
+# --- BACKUP ROUTES ---
+# --- BACKUP ROUTES ---
+# --- BACKUP ROUTES ---
+
 
 @app.route('/backup_db')
 def backup_db():
@@ -2057,7 +2088,7 @@ def inject_meetings_today():
     return dict(meetings_today=meetings_today)
 
 
-#------------------ EDIT/DELETE ROUTES ---------------------
+#------------------ DASHBOARD ROUTES ---------------------
 
 @app.route('/dashboard')
 def dashboard():
@@ -2106,110 +2137,11 @@ def dashboard():
     )
 
 
-
-# FAKE DATA
-
-def load_fake_data():
-    from faker import Faker
-    import random
-
-    fake = Faker()
-
-    # Sample Partners
-    partners = []
-    for _ in range(5):
-        p = Partner(name=fake.company(), notes=fake.bs())
-        db.session.add(p)
-        partners.append(p)
-
-    # Sample Customers
-    customers = []
-    for _ in range(4):
-        c = Customer(name=fake.company(), cx_services=fake.catch_phrase(), notes=fake.text())
-        db.session.add(c)
-        customers.append(c)
-
-    riot = Customer(name="Riot Games", cx_services="Gaming and Esports Platforms", notes="Top-tier publisher of competitive games.")
-    db.session.add(riot)
-    customers.append(riot)
-    db.session.commit()
-
-    # Sample Contacts
-    for _ in range(5):
-        db.session.add(Contact(
-            name=fake.name(), email=fake.email(), role="Account Manager", contact_type="Cisco",
-            phone=fake.phone_number(), location=fake.city()
-        ))
-
-    for c in customers:
-        for _ in range(2):
-            db.session.add(Contact(
-                name=fake.name(), email=fake.email(), role=fake.job(),
-                contact_type="Customer", customer_id=c.id,
-                phone=fake.phone_number(), location=fake.city()
-            ))
-
-    for p in partners:
-        for _ in range(2):
-            db.session.add(Contact(
-                name=fake.name(), email=fake.email(), role=fake.job(),
-                contact_type="Partner", partner_id=p.id,
-                phone=fake.phone_number(), location=fake.city()
-            ))
-
-    db.session.commit()
-
-    # Sample Meetings and Action Items
-    for c in customers:
-        db.session.add(Meeting(
-            customer_id=c.id,
-            date=fake.date_this_year().strftime('%Y-%m-%d'),
-            title=fake.catch_phrase(),
-            host=fake.name(),
-            notes=fake.text()
-        ))
-
-        db.session.add(RecurringMeeting(
-            customer_id=c.id,
-            start_datetime=fake.date_time_this_year(),
-            title="Recurring " + fake.bs(),
-            host=fake.name(),
-            recurrence_pattern="Monthly",
-            repeat_until=fake.date_this_year()
-        ))
-
-        db.session.add(ActionItem(
-            date=fake.date_this_year().strftime('%Y-%m-%d'),
-            detail=fake.sentence(),
-            customer_id=c.id,
-            customer_contact=fake.name(),
-            cisco_contact=fake.name(),
-            completed=random.choice([True, False])
-        ))
-
-    db.session.commit()
-
-    # Riot Divisions
-    root_division = Division(name='Riot Games', customer_id=riot.id)
-    db.session.add(root_division)
-    db.session.flush()
-
-    db.session.add_all([
-        Division(name='Riot Direct', customer_id=riot.id, parent=root_division),
-        Division(name='Riot Esports', customer_id=riot.id, parent=root_division),
-        Division(name='Riot Corporate', customer_id=riot.id, parent=root_division)
-    ])
-    db.session.commit()
-
-
 # --------------------- MAIN ---------------------
 if __name__ == '__main__':
     ENABLE_FAKE_DATA = False  # ← Set to True if you ever want to load dummy data again
 
     with app.app_context():
         db.create_all()
-
-        if ENABLE_FAKE_DATA and not Customer.query.first():
-            load_fake_data()
 
     app.run(debug=True)

@@ -67,6 +67,9 @@ echo "📄 Step 7: Writing environment file..."
 printf 'ONEDRIVE_PATH="%s"\n' "$ONEDRIVE_PATH" > .env
 printf 'DATABASE_PATH="%s/APP/account_team.db"\n' "$ONEDRIVE_PATH" >> .env
 
+echo "🖥️  Step 8: Naming this device..."
+read -p "Enter a short name for this User (e.g., Nik, Gary): " DEVICE_NAME
+printf 'DEVICE_NAME="%s"\n' "$DEVICE_NAME" >> .env
 
 echo "🎉 Installation complete!"
 echo "👉 You can now run: ./start_crm.sh"

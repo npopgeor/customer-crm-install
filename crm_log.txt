@@ -1,0 +1,22 @@
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+ * Serving Flask app 'app'
+ * Debug mode: on
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
