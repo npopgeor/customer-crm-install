@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 import os
 import re
 import logging
+from threading import Thread
 
 #os.makedirs('backup', exist_ok=True)
 
@@ -25,6 +26,14 @@ import csv
 
 
 app = Flask(__name__)
+
+from flask import g
+
+@app.before_request
+def maybe_run_daily_backup():
+    if request.endpoint == 'dashboard' and not getattr(g, 'backup_checked', False):
+        g.backup_checked = True  # Avoid running multiple times in one request cycle
+        daily_backup_if_needed()
 
 # === Load Environment ===
 load_dotenv()
@@ -75,6 +84,40 @@ division_contacts = db.Table('division_contacts',
     db.Column('division_id', db.Integer, db.ForeignKey('division.id')),
     db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'))
 )
+
+
+def daily_backup_if_needed():
+    today = datetime.now().strftime('%Y%m%d')
+    files = os.listdir(BACKUP_SHARED_DIR)
+    found = any(f.startswith(f"account_team_{today}") for f in files)
+
+    if not found:
+        Thread(target=backup_db_internal).start()
+
+def backup_db_internal():
+    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    filename = f"account_team_{timestamp}.db"
+
+    shared_backup_path = os.path.join(BACKUP_SHARED_DIR, filename)
+    local_backup_path = os.path.join(BACKUP_LOCAL_DIR, filename)
+
+    try:
+        os.makedirs(BACKUP_SHARED_DIR, exist_ok=True)
+        os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
+
+        with open(DATABASE_PATH, 'rb') as src:
+            data = src.read()
+
+        with open(shared_backup_path, 'wb') as f1:
+            f1.write(data)
+        with open(local_backup_path, 'wb') as f2:
+            f2.write(data)
+
+        print(f"✅ Backup successful: {filename}")
+        log_change("Backup created", f"{filename}")
+
+    except Exception as e:
+        print(f"❌ Backup failed: {e}")
 
 def secure_folder_name(name):
     return "".join(c for c in name if c.isalnum() or c in (' ', '_', '-')).rstrip().replace(' ', '_')
@@ -2029,34 +2072,28 @@ def download_recurring_ics(meeting_id):
 def backup_db():
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     filename = f"account_team_{timestamp}.db"
-
-    # Create full paths
     shared_backup_path = os.path.join(BACKUP_SHARED_DIR, filename)
     local_backup_path = os.path.join(BACKUP_LOCAL_DIR, filename)
 
     try:
-        # Ensure backup dirs exist
         os.makedirs(BACKUP_SHARED_DIR, exist_ok=True)
         os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
 
         with open(DATABASE_PATH, 'rb') as src:
             data = src.read()
 
-            # Save to both backup locations
-            with open(shared_backup_path, 'wb') as f1:
-                f1.write(data)
+        with open(shared_backup_path, 'wb') as f1:
+            f1.write(data)
+        with open(local_backup_path, 'wb') as f2:
+            f2.write(data)
 
-            with open(local_backup_path, 'wb') as f2:
-                f2.write(data)
-
-        print(f"✅ Backup successful: {filename}")
-        log_change(f"[{DEVICE_NAME}] Backup created", f"{filename}")
+        log_change(f"[{DEVICE_NAME}] Manual backup", f"{filename}")
         return redirect(url_for('dashboard', msg='✅ Backup saved to OneDrive + Mac!'))
 
     except Exception as e:
-        print(f"❌ Backup failed: {e}")
+        print(f"❌ Manual backup failed: {e}")
         return redirect(url_for('dashboard', msg='❌ Backup failed. Check server logs.'))
-
+    
 # --- Setup Tab Rendering ---
 @app.context_processor
 def inject_division_setup_links():

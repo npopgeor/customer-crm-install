@@ -2,49 +2,9 @@
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
  * Serving Flask app 'app'
  * Debug mode: on
-Traceback (most recent call last):
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/flask/app.py", line 1536, in __call__
-    return self.wsgi_app(environ, start_response)
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/flask/app.py", line 1514, in wsgi_app
-    response = self.handle_exception(e)
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py", line 1829, in delete_meeting
-    log_change("Deleted meeting", f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}")
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/sqlalchemy/orm/attributes.py", line 566, in __get__
-    return self.impl.get(state, dict_)  # type: ignore[no-any-return]
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/sqlalchemy/orm/attributes.py", line 1086, in get
-    value = self._fire_loader_callables(state, key, passive)
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/sqlalchemy/orm/attributes.py", line 1121, in _fire_loader_callables
-    return self.callable_(state, passive)
-  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/venv/lib/python3.10/site-packages/sqlalchemy/orm/strategies.py", line 922, in _load_for_state
-    raise orm_exc.DetachedInstanceError(
-sqlalchemy.orm.exc.DetachedInstanceError: Parent instance <Meeting at 0x10e010b50> is not bound to a Session; lazy load operation of attribute 'customer' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+✅ Backup successful: account_team_20250503_222046.db
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+✅ Backup successful: account_team_20250503_222612.db
