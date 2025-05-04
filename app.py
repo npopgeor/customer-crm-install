@@ -658,6 +658,7 @@ def add_contact():
 
 
         db.session.commit()
+        log_change("Added contact", f"{c.name} – {c.email}")
         return redirect(url_for('contact_list'))
 
     # 👇 Keep everything below the same
@@ -727,6 +728,7 @@ def edit_contact(contact_id):
             contact.divisions = []  # Clear if no customer type
 
         db.session.commit()
+        log_change("Edited contact", f"{contact.name} – {contact.email}")
         return redirect(url_for('contact_list'))
 
     def serialize_contact(c):
@@ -779,7 +781,7 @@ def delete_contact(contact_id):
     # Disassociate from meetings
     for meeting in contact.meetings:
         meeting.participants.remove(contact)
-
+    log_change("Deleted contact", f"{contact.name} – {contact.email}")
     db.session.delete(contact)
     db.session.commit()
     return redirect(url_for('contact_list'))
@@ -787,6 +789,7 @@ def delete_contact(contact_id):
 
 @app.route('/contacts/delete_all')
 def delete_all_contacts():
+    log_change("Deleted all contacts", "All contacts removed via bulk delete.")
     db.session.execute(division_contact.delete())  # Clean up many-to-many link
     Contact.query.delete()
     db.session.commit()
@@ -933,6 +936,7 @@ def add_partner():
                 partner.customers.append(customer)
 
         db.session.add(partner)
+        log_change("Added partner", partner.name)
         db.session.commit()
         return redirect(url_for('partner_list'))
 
@@ -957,6 +961,7 @@ def edit_partner(partner_id):
         partner.customers = Customer.query.filter(Customer.id.in_(customer_ids)).all()
 
         db.session.commit()
+        log_change("Edited partner", partner.name)
         return redirect(url_for('partner_list'))
 
     return render_template('edit_partner.html', partner=partner, customers=customers)
@@ -973,7 +978,7 @@ def delete_partner(partner_id):
     # Disassociate the partner from any contacts
     for contact in partner.contacts:
         contact.partner_id = None
-
+    log_change("Deleted partner", partner.name)
     db.session.delete(partner)
     db.session.commit()
     return redirect(url_for('partner_list'))
@@ -1044,6 +1049,7 @@ def add_customer():
             customer.contacts.append(contact)
 
         db.session.add(customer)
+        log_change("Added customer", customer.name)
         db.session.commit()
 
         division_name = request.form.get('division_name')
@@ -1072,6 +1078,7 @@ def edit_customer(id):
         customer.cx_services = request.form.get('cx_services')
         customer.notes = request.form.get('notes')
 
+        log_change("Edited customer", customer.name)
         db.session.commit()
         return redirect(url_for('customer_detail', id=customer.id))
 
@@ -1097,9 +1104,10 @@ def delete_customer(id):
 
     for division in customer.divisions:
         division.customer_id = None
-
+    
+    log_change("Deleted customer", customer.name)
     db.session.commit()  # commit disassociations first
-
+    
     db.session.delete(customer)
     db.session.commit()
     return redirect(url_for('customer_list'))
@@ -1195,6 +1203,7 @@ def add_customer_opportunity(customer_id):
 
     new_opp = CustomerOpportunity(customer_id=customer.id, title=title, value=value, stage=stage, notes=notes)
     db.session.add(new_opp)
+    log_change("Added customer opportunity", title)
     db.session.commit()
     return redirect(url_for('customer_detail', id=customer.id))
 
@@ -1209,6 +1218,7 @@ def add_customer_technology(customer_id):
 
     new_tech = CustomerTechnology(customer_id=customer.id, name=name, discount_level=discount_level, notes=notes)
     db.session.add(new_tech)
+    log_change("Added customer technology", name)
     db.session.commit()
     return redirect(url_for('customer_detail', id=customer.id))
 
@@ -1224,6 +1234,7 @@ def add_customer_project(customer_id):
 
     new_proj = CustomerProject(customer_id=customer.id, name=name, status=status, owner=owner, notes=notes)
     db.session.add(new_proj)
+    log_change("Added customer project", name)
     db.session.commit()
     return redirect(url_for('customer_detail', id=customer.id))
 
@@ -1590,6 +1601,7 @@ def add_action_item():
 def delete_action_item(item_id):
     item = ActionItem.query.get_or_404(item_id)
     category = item.category  # ✅ Capture the current category before deletion
+    log_change("Deleted action item", f"{item.detail} (Customer ID: {item.customer_id})")
     db.session.delete(item)
     db.session.commit()
     return redirect(url_for('action_item_list', tab=category))
@@ -1608,6 +1620,8 @@ def edit_action_item(item_id):
         item.completed = 'completed' in request.form
         item.category = request.form.get('category', item.category)  # ← Allow changing category
         db.session.commit()
+        log_change("Edited action item", f"{item.detail} (Customer ID: {item.customer_id})")
+
 
         # Redirect to correct tab based on (possibly updated) category
         return redirect(url_for('action_item_list', tab=item.category))
@@ -1633,6 +1647,7 @@ def add_action_item_update(item_id):
         )
         db.session.add(update)
         db.session.commit()
+        log_change("Added action item update", f"Item ID: {item_id} – {text[:50]}")
 
     return redirect(url_for('edit_action_item', item_id=item_id))
 
@@ -1649,6 +1664,7 @@ def edit_action_item_update(update_id):
         update.update_text = update_text
         update.timestamp = datetime.now()
         db.session.commit()
+        log_change("Edited action item update", f"Update ID: {update_id} – {update_text[:50]}")
 
     return redirect(url_for('edit_action_item', item_id=item_id))
 
@@ -1658,7 +1674,7 @@ def delete_action_item_update(update_id):
     item = update.parent  # or ActionItem.query.get(update.action_item_id)
 
     tab = request.args.get('tab', item.category)  # ← Get tab from request, fallback to current category
-
+    log_change("Deleted action item update", f"Update ID: {update_id} (Item ID: {item.id})")
     db.session.delete(update)
     db.session.commit()
 
@@ -1779,6 +1795,7 @@ def add_meeting():
             meeting.participants.append(contact)
         db.session.add(meeting)
         db.session.commit()
+        log_change("Added meeting", f"{meeting.title} for {meeting.customer.name} on {meeting.date}")
         return redirect_back(fallback_endpoint='meeting_list')  # 👈 updated
         
     customers = Customer.query.all()
@@ -1798,12 +1815,14 @@ def edit_meeting(meeting_id):
         meeting.host = request.form['host']
         meeting.notes = request.form.get('notes')
         db.session.commit()
+        log_change("Edited meeting", f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}")
         return redirect(url_for('meeting_list'))
     return render_template('edit_meeting.html', meeting=meeting)
 
 @app.route('/meetings/delete/<int:meeting_id>')
 def delete_meeting(meeting_id):
     meeting = Meeting.query.get_or_404(meeting_id)
+    log_change("Deleted meeting", f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}")
     db.session.delete(meeting)
     db.session.commit()
     return redirect(url_for('meeting_list'))
@@ -1890,6 +1909,7 @@ def add_recurring_meeting():
 
         db.session.add(meeting)
         db.session.commit()
+        log_change("Added recurring meeting", f"{meeting.title} every {meeting.recurrence_pattern} for {meeting.customer.name}")
 
         if generate_ics:
             cal = Calendar()
@@ -1946,6 +1966,7 @@ def edit_recurring_meeting(meeting_id):
         meeting.duration_minutes = request.form.get('duration_minutes', type=int) or 60
 
         db.session.commit()
+        log_change("Edited recurring meeting", f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}")
         return redirect(url_for('recurring_meeting_list'))
 
     customers = Customer.query.all()
@@ -1954,6 +1975,7 @@ def edit_recurring_meeting(meeting_id):
 @app.route('/recurring_meetings/delete/<int:meeting_id>')
 def delete_recurring_meeting(meeting_id):
     meeting = RecurringMeeting.query.get_or_404(meeting_id)
+    log_change("Deleted recurring meeting", f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}")
     db.session.delete(meeting)
     db.session.commit()
     return redirect(url_for('recurring_meeting_list'))
@@ -2028,6 +2050,7 @@ def backup_db():
                 f2.write(data)
 
         print(f"✅ Backup successful: {filename}")
+        log_change(f"[{DEVICE_NAME}] Backup created", f"{filename}")
         return redirect(url_for('dashboard', msg='✅ Backup saved to OneDrive + Mac!'))
 
     except Exception as e:
