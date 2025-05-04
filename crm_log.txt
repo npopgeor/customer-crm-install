@@ -8,3 +8,5 @@
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
 ✅ Backup successful: account_team_20250503_222612.db
+/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '
