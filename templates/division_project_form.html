@@ -1,0 +1,24 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h3>{{ project and '✏️ Edit' or '➕ Add' }} Project</h3>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Project Name</label>
+    <input type="text" name="name" class="form-control" required value="{{ project.name if project else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Status</label>
+    <input type="text" name="status" class="form-control" value="{{ project.status if project else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Owner</label>
+    <input type="text" name="owner" class="form-control" value="{{ project.owner if project else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" class="form-control">{{ project.notes if project else '' }}</textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">💾 Save</button>
+  <a href="{{ url_for('division_detail', division_id=project.division_id if project else division_id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h3>{{ technology and '✏️ Edit' or '➕ Add' }} Technology</h3>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Technology Name</label>
+    <input type="text" name="name" class="form-control" required value="{{ technology.name if technology else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Discount Level (%)</label>
+    <input type="number" name="discount_level" class="form-control" value="{{ technology.discount_level if technology else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" class="form-control">{{ technology.notes if technology else '' }}</textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">💾 Save</button>
+  <a href="{{ url_for('division_detail', division_id=technology.division_id if technology else division_id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}

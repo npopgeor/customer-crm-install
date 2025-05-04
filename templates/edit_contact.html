@@ -1,0 +1,192 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">✏️ Edit Contact</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Full Name</label>
+      <input name="name" value="{{ contact.name }}" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email Address</label>
+      <input name="email" value="{{ contact.email }}" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Phone Number</label>
+      <input name="phone" value="{{ contact.phone }}" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Role</label>
+      <input name="role" value="{{ contact.role }}" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Location</label>
+      <input name="location" value="{{ contact.location }}" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Technology</label>
+      <input name="technology" value="{{ contact.technology }}" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Reports To</label>
+      <select name="reports_to" id="reportsToSelect" class="form-select">
+        <option value="">-- None --</option>
+      </select>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Contact Type</label>
+      <select name="contact_type" class="form-select" id="contactTypeSelect" required onchange="toggleAssociationFields()">
+        <option value="Cisco" {% if contact.contact_type == 'Cisco' %}selected{% endif %}>Cisco</option>
+        <option value="Partner" {% if contact.contact_type == 'Partner' %}selected{% endif %}>Partner</option>
+        <option value="Customer" {% if contact.contact_type == 'Customer' %}selected{% endif %}>Customer</option>
+      </select>
+    </div>
+    <div class="mb-3" id="customerField" style="display: none;">
+      <label class="form-label">Associated Customer</label>
+      <select name="customer_id" id="customerSelect" class="form-select">
+        <option value="">-- None --</option>
+        {% for customer in customers %}
+        <option value="{{ customer.id }}" {% if customer.id == contact.customer_id %}selected{% endif %}>{{ customer.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="mb-3" id="partnerField" style="display: none;">
+      <label class="form-label">Associated Partner</label>
+      <select name="partner_id" class="form-select">
+        <option value="">-- None --</option>
+        {% for partner in partners %}
+        <option value="{{ partner.id }}" {% if partner.id == contact.partner_id %}selected{% endif %}>{{ partner.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-4" id="divisionSection" style="display: none;">
+      <label class="form-label">Assign to Divisions (optional)</label>
+      <div id="divisionCheckboxes" class="row"></div>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Notes</label>
+      <textarea name="notes" class="form-control">{{ contact.notes }}</textarea>
+    </div>
+    <button class="btn btn-warning">Update Contact</button>
+    <a href="{{ url_for('contact_list') }}" class="btn btn-link">⬅ Back</a>
+  </form>
+</div>
+
+<script id="contacts-json" type="application/json">
+  {{ contacts_by_type | tojson | safe }}
+</script>
+<script id="customer-divisions-json" type="application/json">
+  {{ customer_divisions | default({}) | tojson | safe }}
+</script>
+<script>
+  const contactData = JSON.parse(document.getElementById('contacts-json').textContent);
+  const customerDivisions = JSON.parse(document.getElementById('customer-divisions-json').textContent);
+  const selectedReportsTo = "{{ contact.reports_to or '' }}";
+  const selectedType = "{{ contact.contact_type }}";
+  const assignedDivisions = JSON.parse('{{ contact.divisions | default([]) | map(attribute="id") | list | tojson | safe }}');
+
+  function updateReportsToOptions(type) {
+    const select = document.getElementById('reportsToSelect');
+    select.innerHTML = '<option value="">-- None --</option>';
+
+    if (type === 'Customer') {
+      const selectedCustomerId = document.querySelector('[name="customer_id"]').value;
+      const list = (contactData.Customer || []).filter(contact => String(contact.customer_id) === selectedCustomerId);
+      list.forEach(contact => {
+        if (String(contact.id) !== "{{ contact.id }}") {
+          const option = document.createElement('option');
+          option.value = contact.id;
+          option.textContent = contact.name;
+          if (String(contact.id) === selectedReportsTo) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        }
+      });
+    } else {
+      const list = contactData[type] || [];
+      list.forEach(contact => {
+        if (String(contact.id) !== "{{ contact.id }}") {
+          const option = document.createElement('option');
+          option.value = contact.id;
+          option.textContent = contact.name;
+          if (String(contact.id) === selectedReportsTo) {
+            option.selected = true;
+          }
+          select.appendChild(option);
+        }
+      });
+    }
+  }
+
+  function updateDivisionCheckboxes() {
+    const selectedCustomerId = document.querySelector('[name="customer_id"]').value;
+    const divisions = customerDivisions[selectedCustomerId] || [];
+    const container = document.getElementById('divisionCheckboxes');
+    const section = document.getElementById('divisionSection');
+
+    container.innerHTML = '';
+    if (divisions.length) {
+      section.style.display = 'block';
+      divisions.forEach(d => {
+        const div = document.createElement('div');
+        div.className = 'col-md-4';
+        div.innerHTML = `
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="division_ids" value="${d.id}" ${assignedDivisions.includes(d.id) ? 'checked' : ''}>
+            <label class="form-check-label">${d.name}</label>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    } else {
+      section.style.display = 'none';
+    }
+  }
+
+  function toggleAssociationFields() {
+    const type = document.getElementById('contactTypeSelect').value;
+    document.getElementById('customerField').style.display = type === 'Customer' ? 'block' : 'none';
+    document.getElementById('partnerField').style.display = type === 'Partner' ? 'block' : 'none';
+    updateReportsToOptions(type);
+    updateDivisionCheckboxes();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    toggleAssociationFields();
+    document.querySelector('[name="customer_id"]').addEventListener('change', () => {
+      const type = document.querySelector('[name="contact_type"]').value;
+      if (type === 'Customer') {
+        updateReportsToOptions(type);
+        updateDivisionCheckboxes();
+      }
+    });
+    document.querySelector('[name="contact_type"]').addEventListener('change', () => {
+      toggleAssociationFields();
+      updateDivisionCheckboxes();
+    });
+  });
+
+ 
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/contacts";
+        }, 100);
+      }
+    });
+  });
+
+
+</script>
+{% endblock %}

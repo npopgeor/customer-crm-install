@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="container d-flex justify-content-center align-items-center py-5">
+  <div class="card shadow rounded-4" style="max-width: 600px; width: 100%;">
+    <div class="card-body">
+      <h2 class="card-title mb-4 text-center">👁️ Contact Details</h2>
+
+      <ul class="list-group list-group-flush mb-4">
+        <li class="list-group-item"><strong>Name:</strong> {{ contact.name }}</li>
+        <li class="list-group-item"><strong>Email:</strong> <a href="mailto:{{ contact.email }}">{{ contact.email }}</a></li>
+        <li class="list-group-item"><strong>Phone:</strong> {{ contact.phone or '—' }}</li>
+        <li class="list-group-item"><strong>Role:</strong> {{ contact.role }}</li>
+        <li class="list-group-item"><strong>Location:</strong> {{ contact.location or '—' }}</li>
+        <li class="list-group-item"><strong>Technology:</strong> {{ contact.technology or '—' }}</li>
+        <li class="list-group-item"><strong>Reports To:</strong> {{ contact.manager.name if contact.manager else '—' }}</li>
+        <li class="list-group-item"><strong>Customer:</strong> {{ contact.customer.name if contact.customer else '—' }}</li>
+        <li class="list-group-item"><strong>Partner:</strong> {{ contact.partner.name if contact.partner else '—' }}</li>
+        <li class="list-group-item"><strong>Notes:</strong> {{ contact.notes or '—' }}</li>
+      </ul>
+
+      <div class="d-flex justify-content-center">
+        <a href="{{ url_for('contact_list') }}" class="btn btn-outline-primary rounded-pill px-4">⬅️ Back to Contact List</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("keydown", function (event) {
+        // Make sure no accidental submits interfere
+        if ((event.key === "Escape" || event.keyCode === 27) &&
+            document.activeElement.tagName !== "TEXTAREA" &&
+            document.activeElement.tagName !== "INPUT") {
+          
+          event.preventDefault(); // <--- Important: stop any browser default handling
+          console.log("Forced redirect on Esc");
+  
+          setTimeout(() => {
+            window.location.href = "/contacts";
+          }, 100); // Short delay to let DOM settle (just in case)
+        }
+      });
+    });
+  </script>
+
+{% endblock %}

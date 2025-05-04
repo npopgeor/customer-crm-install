@@ -1,0 +1,114 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2 class="mb-4">🔍 Results for "{{ query }}"</h2>
+
+
+{#
+<!-- Customers -->
+<h4>🏢 Customers</h4>
+{% if customers %}
+  <ul class="list-group mb-4">
+    {% for c in customers %}
+    <li class="list-group-item">
+      <a href="{{ url_for('customer_detail', id=c.id) }}" class="fw-bold text-decoration-none" style="font-size: 1.2rem; color: #0d6efd;">
+        {{ c.name }}
+      </a>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No matching customers found.</p>
+{% endif %}
+
+
+
+
+<!-- Partners -->
+<h4>🤝 Partners</h4>
+{% if partners %}
+  <ul class="list-group mb-4">
+    {% for p in partners %}
+    <li class="list-group-item">
+      <a href="{{ url_for('partner_detail', partner_id=p.id) }}" class="fw-bold text-decoration-none" style="font-size: 1.2rem; color: #0d6efd;">
+        {{ p.name }}
+      </a>
+      <div class="text-muted small">{{ p.notes or 'No notes' }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No matching partners found.</p>
+{% endif %}
+
+#}
+
+
+<!-- Contacts -->
+<h4>👥 Contacts</h4>
+{% if contacts %}
+  <ul class="list-group mb-4">
+    {% for c in contacts %}
+    <li class="list-group-item">
+      <div class="fw-bold">
+        <a href="{{ url_for('view_contact', contact_id=c.id) }}" class="text-decoration-none" style="color: #0d6efd; font-size: 1.1rem;">
+          {{ c.name }}
+        </a>
+      </div>
+      <div class="text-muted small">
+        {{ c.contact_type }}
+        {% if c.customer %} | Customer: {{ c.customer.name }}{% endif %}
+        {% if c.partner %} | Partner: {{ c.partner.name }}{% endif %}
+      </div>
+      <div>Email: <a href="mailto:{{ c.email }}">{{ c.email }}</a></div>
+      <div>Role: {{ c.role }}</div>
+      <div>Technology: {{ c.technology or '—' }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No matching contacts found.</p>
+{% endif %}
+
+
+<!-- File and Folder Matches -->
+<h4>📄 Files & Folders</h4>
+{% if file_name_hits %}
+  <ul class="list-group mb-4">
+    {% for path in file_name_hits %}
+      <li class="list-group-item">
+        {% if path.endswith('/') %}
+          <strong>📁 {{ path }}</strong>  {# Folder - plain text #}
+        {% else %}
+          <a href="{{ url_for('serve_from_onedrive', filename=path) }}" target="_blank">
+            {{ path }}
+          </a>
+        {% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No matching files or folders found.</p>
+{% endif %}
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+
+<a href="/" class="btn btn-link mt-4">⬅️ Back to Home</a>
+{% endblock %}

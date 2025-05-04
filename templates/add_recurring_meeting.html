@@ -1,0 +1,84 @@
+{% extends 'layout.html' %}
+{% block content %}
+  
+<h2 class="mb-4">➕ Add Recurring Meeting</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Start Date and Time <span class="text-danger">*</span></label>
+    <input type="datetime-local" name="start_datetime" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="duration_minutes" class="form-label">Duration (in minutes)</label>
+    <input type="number" name="duration_minutes" class="form-control" value="60" min="1">
+  </div>
+  
+  <div class="mb-3">
+    <label class="form-label">Title <span class="text-danger">*</span></label>
+    <input name="title" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Customer <span class="text-danger">*</span></label>
+    <select name="customer_id" class="form-select" required>
+      {% for customer in customers %}
+      <option value="{{ customer.id }}">{{ customer.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Meeting Host</label>
+    <input name="host" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Recurrence Pattern <span class="text-danger">*</span></label>
+    <select name="recurrence_pattern" class="form-select" required>
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="biweekly">Bi-weekly</option>
+      <option value="monthly">Monthly</option>
+    </select>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Repeat Until <span class="text-danger">*</span></label>
+    <input type="date" name="repeat_until" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Meeting Description</label>
+    <textarea name="description" class="form-control"></textarea>
+  </div>
+
+  <div class="mb-3 form-check">
+    <input type="checkbox" name="generate_ics" class="form-check-input" id="generateIcs">
+    <label class="form-check-label" for="generateIcs">Generate Outlook Invite (.ics)</label>
+  </div>
+
+  <button class="btn btn-success">Save Meeting</button>
+</form>
+
+</div>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/recurring_meetings";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+{% endblock %}

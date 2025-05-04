@@ -1,0 +1,108 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+<!-- Contacts Section -->
+{% macro render_tree(contact, seen) %}
+  {% if contact.id not in seen %}
+    {% set _ = seen.append(contact.id) %}
+    <li>
+      {{ contact.name }} – {{ contact.role }}
+      {% if contact.email %}
+        (<a href="mailto:{{ contact.email }}">{{ contact.email }}</a>)
+      {% endif %}
+      {% if contact.subordinates %}
+        <ul>
+          {% for sub in contact.subordinates %}
+            {{ render_tree(sub, seen) }}
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </li>
+  {% endif %}
+{% endmacro %}
+
+<div class="pt-3">
+  <!-- Header and Action Buttons -->
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">🤝 {{ partner.name }}</h2>
+      <p class="mb-0 text-muted">Partner Details</p>
+    </div>
+    <div>
+      <a href="{{ url_for('edit_partner', partner_id=partner.id) }}" class="btn btn-outline-warning me-2">✏️ Edit</a>
+      <a href="{{ url_for('delete_partner', partner_id=partner.id) }}" class="btn btn-outline-danger" onclick="return confirm('Delete this partner?');">🗑 Delete</a>
+    </div>
+  </div>
+
+  <!-- Notes Section -->
+  <div class="mb-3 p-3 border rounded bg-light">
+    <h5 class="mb-2">🗒️ Notes</h5>
+    <p class="mb-0">{{ partner.notes or '—' }}</p>
+  </div>
+
+  <div class="mt-4">
+    <div class="card p-3">
+      <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark"
+         data-bs-toggle="collapse"
+         href="#partnerContactCollapse"
+         role="button"
+         aria-expanded="false"
+         aria-controls="partnerContactCollapse">
+        <h5 class="mb-0">👥 Associated Contacts</h5>
+        <span class="text-primary small">Show/Hide</span>
+      </a>
+      <div class="collapse" id="partnerContactCollapse">
+        <div class="mt-3">
+          {% if partner.contacts %}
+            <ul class="tree">
+              {% for contact in partner.contacts if not contact.reports_to %}
+                {{ render_tree(contact, []) }}
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted">No contacts assigned.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Linked Customers -->
+  <div class="mb-3 p-3 border rounded">
+    <h5 class="mb-2">🏢 Linked Customers</h5>
+    {% if partner.customers %}
+    <ul class="mb-0">
+      {% for customer in partner.customers %}
+      <li><a href="{{ url_for('customer_detail', id=customer.id) }}">{{ customer.name }}</a></li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-muted">Not linked to any customers.</p>
+    {% endif %}
+  </div>
+
+  <a href="{{ url_for('partner_list') }}" class="btn btn-link mt-4">⬅ Back to Partner List</a>
+</div>
+
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/partners";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+{% endblock %}

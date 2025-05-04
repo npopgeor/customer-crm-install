@@ -1,0 +1,234 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-0">📇 Contact List</h2>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('add_contact') }}" class="btn btn-primary">➕ Add Contact</a>
+    <a href="{{ url_for('export_contacts_csv') }}" class="btn btn-outline-secondary">📤 Export CSV</a>
+    <a href="{{ url_for('import_contacts_csv') }}" class="btn btn-outline-success">📥 Import CSV</a>
+    <a href="{{ url_for('delete_all_contacts') }}" class="btn btn-outline-danger"
+       onclick="return confirm('Are you sure you want to delete ALL contacts? This cannot be undone.') && confirm('Final confirmation: Delete ALL contacts?');">
+      🧨 Delete All Contacts
+    </a>
+  </div>
+</div>
+
+<!-- Filters -->
+<div class="mb-4 d-flex gap-3 flex-wrap">
+  <select id="filterType" class="form-select w-auto">
+    <option value="">All Types</option>
+    <option value="Cisco">Cisco</option>
+    <option value="Customer">Customer</option>
+    <option value="Partner">Partner</option>
+  </select>
+  <input type="text" id="filterTech" class="form-control w-auto" placeholder="Technology">
+  <input type="text" id="filterRole" class="form-control w-auto" placeholder="Role">
+</div>
+
+<div class="d-flex flex-column gap-4">
+
+  <!-- 🔵 Cisco Contacts -->
+  <div class="card p-3 h-100">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">🔵 Cisco Contacts</h5>
+      <a class="text-primary small" data-bs-toggle="collapse" href="#ciscoCollapse" role="button" aria-expanded="false" aria-controls="ciscoCollapse">
+        Show/Hide
+      </a>
+    </div>
+    <div class="collapse show" id="ciscoCollapse">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th><th>Email</th><th>Role</th><th>Technology</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="cisco-table">
+          {% for c in cisco_contacts %}
+          <tr data-type="Cisco" data-tech="{{ c.technology|lower }}" data-role="{{ c.role|lower }}">
+            <td><a href="{{ url_for('view_contact', contact_id=c.id) }}" class="text-decoration-none" style="color: #0d6efd;">{{ c.name }}</a></td>
+            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+            <td>{{ c.role }}</td>
+            <td>{{ c.technology }}</td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('edit_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-warning">✏️</a>
+                <a href="{{ url_for('delete_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this contact?');">🗑️</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- 🟢 Customer Contacts -->
+  <div class="card p-3 h-100">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">🟢 Customer Contacts</h5>
+      <a class="text-primary small" data-bs-toggle="collapse" href="#customerCollapse" role="button" aria-expanded="false" aria-controls="customerCollapse">
+        Show/Hide
+      </a>
+    </div>
+    <div class="collapse show" id="customerCollapse">
+      {% for customer in customer_contacts %}
+      <h6 class="border-bottom pb-1">{{ customer.name }}</h6>
+      <table class="table table-hover align-middle mb-4">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th><th>Email</th><th>Role</th><th>Technology</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in customer.contacts if c.contact_type == 'Customer' %}
+          <tr data-type="Customer" data-tech="{{ c.technology|lower }}" data-role="{{ c.role|lower }}">
+            <td><a href="{{ url_for('view_contact', contact_id=c.id) }}" class="text-decoration-none" style="color: #0d6efd;">{{ c.name }}</a></td>
+            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+            <td>{{ c.role }}</td>
+            <td>{{ c.technology }}</td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('edit_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-warning">✏️</a>
+                <a href="{{ url_for('delete_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this contact?');">🗑️</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 🟠 Partner Contacts -->
+  <div class="card p-3 h-100">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">🟠 Partner Contacts</h5>
+      <a class="text-primary small" data-bs-toggle="collapse" href="#partnerCollapse" role="button" aria-expanded="false" aria-controls="partnerCollapse">
+        Show/Hide
+      </a>
+    </div>
+    <div class="collapse show" id="partnerCollapse">
+      {% for partner in partner_contacts %}
+      <h6 class="border-bottom pb-1">{{ partner.name }}</h6>
+      <table class="table table-hover align-middle mb-4">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th><th>Email</th><th>Role</th><th>Technology</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in partner.contacts if c.contact_type == 'Partner' %}
+          <tr data-type="Partner" data-tech="{{ c.technology|lower }}" data-role="{{ c.role|lower }}">
+            <td><a href="{{ url_for('view_contact', contact_id=c.id) }}" class="text-decoration-none" style="color: #0d6efd;">{{ c.name }}</a></td>
+            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+            <td>{{ c.role }}</td>
+            <td>{{ c.technology }}</td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('edit_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-warning">✏️</a>
+                <a href="{{ url_for('delete_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this contact?');">🗑️</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- 🟡 Unassigned Contacts -->
+  {% if unassigned_contacts %}
+  <div class="card p-3 h-100">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="mb-0">🟡 Unassigned Contacts</h5>
+      <a class="text-primary small" data-bs-toggle="collapse" href="#unassignedCollapse" role="button" aria-expanded="false" aria-controls="unassignedCollapse">
+        Show/Hide
+      </a>
+    </div>
+    <div class="collapse show" id="unassignedCollapse">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th><th>Email</th><th>Role</th><th>Technology</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in unassigned_contacts %}
+          <tr data-type="Unassigned" data-tech="{{ c.technology|lower }}" data-role="{{ c.role|lower }}">
+            <td><a href="{{ url_for('view_contact', contact_id=c.id) }}" class="text-decoration-none" style="color: #0d6efd;">{{ c.name }}</a></td>
+            <td><a href="mailto:{{ c.email }}">{{ c.email }}</a></td>
+            <td>{{ c.role }}</td>
+            <td>{{ c.technology }}</td>
+            <td class="text-center">
+              <div class="d-flex justify-content-center gap-2">
+                <a href="{{ url_for('edit_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-warning">✏️</a>
+                <a href="{{ url_for('delete_contact', contact_id=c.id) }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this contact?');">🗑️</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+
+<script>
+  const typeFilter = document.getElementById('filterType');
+  const techFilter = document.getElementById('filterTech');
+  const roleFilter = document.getElementById('filterRole');
+
+  function applyFilters() {
+    const type = typeFilter.value;
+    const tech = techFilter.value.toLowerCase();
+    const role = roleFilter.value.toLowerCase();
+
+    const rows = document.querySelectorAll('tbody tr');
+
+    rows.forEach(row => {
+      const rowType = row.dataset.type;
+      const rowTech = row.dataset.tech || '';
+      const rowRole = row.dataset.role || '';
+
+      const typeMatch = !type || rowType === type;
+      const techMatch = !tech || rowTech.includes(tech);
+      const roleMatch = !role || rowRole.includes(role);
+
+      if (typeMatch && techMatch && roleMatch) {
+        row.classList.remove('hidden-row');
+      } else {
+        row.classList.add('hidden-row');
+      }
+    });
+  }
+
+  [typeFilter, techFilter, roleFilter].forEach(input => {
+    input.addEventListener('input', applyFilters);
+  });
+
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+
+{% endblock %}

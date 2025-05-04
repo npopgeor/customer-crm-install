@@ -1,0 +1,114 @@
+{% extends 'layout.html' %}
+{% block content %}
+{% set open_folder = request.args.get('open') %}
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>📂 Attachments for {{ customer.name }}</h2>
+    {#
+      <form method="POST" action="{{ url_for('sync_customer_files', id=customer.id) }}">
+        <button type="submit" class="btn btn-outline-secondary">🔄 Sync Manually with the Upload Folder</button>
+      </form>
+      #}
+      
+  </div>
+
+  <a href="{{ url_for('customer_detail', id=customer.id) }}" class="btn btn-link mb-4">⬅️ Back to Customer</a>
+
+  <div class="card p-3 mb-4">
+    <h5 class="mb-3">Root Attachments</h5>
+    {% if root_docs %}
+      {% set root_folders = {} %}
+      {% for doc in root_docs %}
+        {% set parts = doc.filename.split('/') %}
+        {% set folder = parts[:-1] | reject('equalto', safe_customer_name) | join('/') %}
+        {% if not doc.filename.endswith('.DS_Store') %}
+          {% set _ = root_folders.setdefault(folder, []).append(doc) %}
+        {% endif %}
+      {% endfor %}
+
+      {% for folder, docs in root_folders.items() %}
+        {% set folder_index = loop.index %}
+        {% set is_open = request.args.get('open') == 'root_folder_' ~ folder_index %}
+        <div class="mb-3">
+          <a class="d-flex justify-content-between align-items-center text-decoration-none"
+            data-bs-toggle="collapse" href="#root_folder_{{ folder_index }}" role="button"
+            aria-expanded="{{ 'true' if is_open else 'false' }}"
+            aria-controls="root_folder_{{ folder_index }}">
+            <strong>📁 {{ folder or '[root]' }}</strong>
+            {% set count = docs | length %}
+            {% if count > 0 %}
+              <small class="text-muted">({{ count }} file{{ 's' if count != 1 else '' }})</small>
+            {% endif %}
+          </a>
+
+          <div class="collapse mt-2 {{ 'show' if is_open else '' }}" id="root_folder_{{ folder_index }}">
+            <ul class="list-unstyled">
+              {% for doc in docs %}
+              <li class="mb-2 d-flex justify-content-between align-items-center">
+                <a href="{{ url_for('uploaded_file', filename=doc.filename) }}" target="_blank">
+                  {{ doc.filename.split('/')[-1] }}
+                </a>
+                {# 
+                <form method="POST" action="{{ url_for('delete_customer_file', file_id=doc.id) }}?open=root_folder_{{ folder_index }}">
+                  <input type="hidden" name="referer" value="{{ request.path }}?open=root_folder_{{ folder_index }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger ms-2">🗑️</button>
+                </form>
+                #}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <p class="text-muted">No root attachments uploaded yet.</p>
+    {% endif %}
+  </div>
+
+  <div class="card p-3 mb-4">
+    <h5 class="mb-3">Division Attachments</h5>
+    {% if division_docs %}
+      <ul class="list-unstyled">
+        {% for doc in division_docs if not doc.filename.endswith('.DS_Store') %}
+        <li class="mb-2 d-flex justify-content-between align-items-center">
+          <a href="{{ url_for('uploaded_file', filename=doc.filename) }}" target="_blank">{{ doc.filename }}</a>
+          {# 
+          <form method="POST" action="{{ url_for('delete_customer_file', file_id=doc.id) }}">
+            <button type="submit" class="btn btn-sm btn-outline-danger ms-2">🗑️</button>
+          </form>
+          #}
+        </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-muted">No division attachments uploaded yet.</p>
+    {% endif %}
+  </div>
+
+  <!-- Upload Form -->
+  <form method="POST" action="{{ url_for('upload_customer_file', id=customer.id) }}" enctype="multipart/form-data" class="mt-4 d-flex gap-2">
+    <input type="file" name="files" class="form-control" multiple required>
+    <button type="submit" class="btn btn-primary">➕ Upload Selected Files</button>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/customer/{{ customer.id }}";
+        }, 100);
+      }
+    });
+  });
+</script>
+
+{% endblock %}

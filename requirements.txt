@@ -1,0 +1,7 @@
+Flask
+Flask-SQLAlchemy
+Werkzeug
+icalendar
+MarkupSafe
+python-dotenv
+

@@ -1,0 +1,122 @@
+html {
+    font-size: 18px;
+  }
+  
+  body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    background-color: #f4f6f8;
+    color: #333;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 260px;
+    background-color: #f0f2f5;
+    padding: 24px;
+    border-right: 1px solid #dcdfe3;
+  }
+  
+  .sidebar h4 a {
+    text-decoration: none;
+    color: #222;
+    font-weight: 600;
+  }
+  
+  .sidebar a.nav-link {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+    color: #444;
+    background: #ffffff;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .sidebar a.nav-link:hover {
+    background-color: #e0e7ef;
+  }
+  
+  /* Badge */
+  .badge-right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Main Content */
+  .content {
+    flex-grow: 1;
+    padding: 40px;
+    background-color: #f9fafb;
+  }
+  
+  .container-xl {
+    background: #ffffff;
+    border-radius: 10px;
+    padding: 28px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Inputs & Buttons */
+  .form-control,
+  .btn,
+  .btn-outline-secondary {
+    border-radius: 6px;
+    font-size: 1rem;
+  }
+  
+  /* Links */
+  a {
+    color: #0066cc;
+  }
+  a:hover {
+    color: #004a99;
+    text-decoration: underline;
+  }
+  
+  /* Tables */
+  .action-table th,
+  .action-table td,
+  .fixed-table th,
+  .fixed-table td {
+    padding: 10px;
+    vertical-align: middle;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  .action-table td:nth-child(2),
+  .action-table th:nth-child(2) {
+    width: 600px;
+  }
+  
+  /* Tree View */
+  .tree, .tree ul {
+    list-style-type: none;
+    padding-left: 1rem;
+  }
+  .tree ul {
+    border-left: 1px dashed #bbb;
+  }
+  .tree li {
+    margin: 0.4rem 0;
+  }
+  
+  /* Cards */
+  .card {
+    background: #fff;
+    border: 1px solid #e3e6ea;
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 1.5rem;
+    transition: box-shadow 0.2s ease;
+  }
+  .card:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+  }
+  

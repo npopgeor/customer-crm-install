@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container py-4">
+  <h2>📤 Upload Document for {{ customer.name }}</h2>
+  <form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label class="form-label">Division / Label Name</label>
+      <input type="text" name="division_name" class="form-control" placeholder="Optional label...">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Choose a file</label>
+      <input type="file" name="file" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary">📎 Upload</button>
+    <a href="{{ url_for('customer_detail', id=customer.id) }}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

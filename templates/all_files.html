@@ -1,0 +1,76 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="mb-4">📁 All Uploaded Files</h2>
+</div>
+
+{% if recent_files %}
+  <h5 class="mt-4">🕒 Recently Modified Files in OneDrive</h5>
+  <ul class="list-group mb-4">
+    {% for file in recent_files %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        <div>
+          <a href="{{ url_for('serve_from_onedrive', filename=file.path) }}" target="_blank">
+            {{ file.path.split('/')[-1] }}
+          </a>
+          <small class="text-muted ms-2">in {{ '/'.join(file.path.split('/')[:-1]) }}</small>
+        </div>
+        <span class="badge bg-light text-dark">{{ file.date }}</span>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
+
+<p>Loaded {{ grouped_files|length }} top-level folders.</p>
+
+{% macro render_folder(folder, parent_id='') %}
+  <ul class="list-group ms-3">
+    {% for name, value in folder.items() %}
+      {% set unique_id = (parent_id ~ '_' ~ loop.index)|replace(' ', '_') %}
+      {% if value is string %}
+        <li class="list-group-item">
+          <a href="{{ url_for('serve_from_onedrive', filename=value) }}" target="_blank">{{ name }}</a>
+        </li>
+      {% else %}
+        <li class="list-group-item">
+          <a data-bs-toggle="collapse"
+             href="#collapse_{{ unique_id }}"
+             role="button"
+             aria-expanded="false"
+             aria-controls="collapse_{{ unique_id }}"
+             class="d-flex justify-content-between align-items-center text-decoration-none">
+            <strong>📁 {{ name }}</strong>
+            <small class="text-muted">Click to expand</small>
+          </a>
+          <div class="collapse mt-2" id="collapse_{{ unique_id }}">
+            {{ render_folder(value, unique_id) }}
+          </div>
+        </li>
+      {% endif %}
+    {% endfor %}
+  </ul>
+{% endmacro %}
+
+<div>
+  {{ render_folder(grouped_files) }}
+</div>
+
+<a href="/" class="btn btn-link mt-4">⬅ Back to Dashboard</a>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        event.preventDefault();
+        window.location.href = "/dashboard";
+      }
+    });
+  });
+</script>
+
+{% endblock %}

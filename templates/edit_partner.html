@@ -1,0 +1,55 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">✏️ Edit Partner</h2>
+
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Partner Name</label>
+      <input type="text" name="name" class="form-control" value="{{ partner.name }}" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Notes</label>
+      <textarea name="notes" class="form-control" rows="4">{{ partner.notes }}</textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Assign to Customers</label>
+      <select name="customer_ids" class="form-select" multiple size="6">
+        {% for customer in customers %}
+          <option value="{{ customer.id }}"
+            {% if customer in partner.customers %}selected{% endif %}>
+            {{ customer.name }}
+          </option>
+        {% endfor %}
+      </select>
+      <div class="form-text">Hold Ctrl (or Cmd on Mac) to select multiple.</div>
+    </div>
+
+    <button type="submit" class="btn btn-warning">Update Partner</button>
+    <a href="{{ url_for('partner_list') }}" class="btn btn-link ms-2">⬅ Cancel</a>
+  </form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/partners";
+        }, 100);
+      }
+    });
+  });
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h2 class="mb-4">🤝 Add New Partner</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Partner Name <span class="text-danger">*</span></label>
+      <input name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Assign to Customer(s)</label>
+      <select name="customer_ids" class="form-select" multiple>
+        {% for customer in customers %}
+        <option value="{{ customer.id }}">{{ customer.name }}</option>
+        {% endfor %}
+      </select>
+      <small class="form-text text-muted">Hold Ctrl (Windows) or Command (Mac) to select multiple.</small>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Notes</label>
+      <textarea name="notes" class="form-control"></textarea>
+    </div>
+
+    <button class="btn btn-success">Add Partner</button>
+  </form>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/partners";
+        }, 100);
+      }
+    });
+  });
+
+
+</script>
+{% endblock %}

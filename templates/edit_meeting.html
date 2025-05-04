@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">✏️ Edit Meeting</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Date</label>
+      <input type="date" name="date" value="{{ meeting.date }}" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input name="title" value="{{ meeting.title }}" class="form-control" required>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Host</label>
+      <input name="host" value="{{ meeting.host }}" class="form-control">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Notes</label>
+      <textarea name="notes" class="form-control">{{ meeting.notes }}</textarea>
+    </div>
+    <button class="btn btn-primary">Update Meeting</button>
+  </form>
+  <a href="/meetings" class="btn btn-link mt-3">⬅ Back to Meetings</a>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/meetings";
+        }, 100);
+      }
+    });
+  });
+
+
+</script>
+{% endblock %}

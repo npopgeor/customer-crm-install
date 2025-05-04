@@ -1,0 +1,91 @@
+{% extends 'layout.html' %}
+{% block content %}
+<div class="container py-5">
+  <h2 class="mb-4">✏️ Edit Recurring Meeting</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Date and Time</label>
+      <input type="datetime-local" name="start_datetime"
+             value="{{ meeting.start_datetime.strftime('%Y-%m-%dT%H:%M') if meeting.start_datetime else '' }}"
+             class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label for="duration_minutes" class="form-label">Duration (in minutes)</label>
+      <input type="number" name="duration_minutes" class="form-control" value="{{ meeting.duration_minutes or 60 }}" min="1">
+    </div>
+    
+    <div class="mb-3">
+      <label class="form-label">Title</label>
+      <input name="title" value="{{ meeting.title }}" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Customer</label>
+      <select name="customer_id" class="form-select" required>
+        {% for customer in customers %}
+          <option value="{{ customer.id }}" {% if customer.id == meeting.customer_id %}selected{% endif %}>
+            {{ customer.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Meeting Host</label>
+      <input name="host" value="{{ meeting.host }}" class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Recurrence Pattern</label>
+      <select name="recurrence_pattern" class="form-select">
+        <option value="daily" {% if meeting.recurrence_pattern == 'daily' %}selected{% endif %}>Daily</option>
+        <option value="weekly" {% if meeting.recurrence_pattern == 'weekly' %}selected{% endif %}>Weekly</option>
+        <option value="biweekly" {% if meeting.recurrence_pattern == 'biweekly' %}selected{% endif %}>Biweekly</option>
+        <option value="monthly" {% if meeting.recurrence_pattern == 'monthly' %}selected{% endif %}>Monthly</option>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Repeat Until</label>
+      <input type="date" name="repeat_until"
+             value="{{ meeting.repeat_until.strftime('%Y-%m-%d') if meeting.repeat_until else '' }}"
+             class="form-control">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Description</label>
+      <textarea name="description" class="form-control">{{ meeting.description }}</textarea>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mt-4">
+      <button class="btn btn-warning">Update Meeting</button>
+      <a href="{{ url_for('delete_recurring_meeting', meeting_id=meeting.id) }}"
+         class="btn btn-danger"
+         onclick="return confirm('Are you sure you want to delete this meeting?');">
+        🗑 Delete
+      </a>
+    </div>
+  </form>
+  <a href="{{ url_for('recurring_meeting_list') }}" class="btn btn-link mt-4">⬅ Back</a>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/recurring_meetings";
+        }, 100);
+      }
+    });
+  });
+
+
+</script>
+{% endblock %}

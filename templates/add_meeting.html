@@ -1,0 +1,70 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2 class="mb-4">➕ Add Past Meeting & Notes</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Date <span class="text-danger">*</span></label>
+    <input type="date" name="date" class="form-control" required value="{{ current_date }}">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Title <span class="text-danger">*</span></label>
+    <input name="title" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Customer <span class="text-danger">*</span></label>
+    <select name="customer_id" class="form-select" required>
+      {% for customer in customers %}
+        <option value="{{ customer.id }}" {% if selected_customer_id == customer.id %}selected{% endif %}>
+          {{ customer.name }}
+        </option>
+      {% endfor %}
+    </select>
+    
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Host</label>
+    <input name="host" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Notes <span class="text-danger">*</span></label>
+    <textarea name="notes" class="form-control" rows="5" required></textarea>
+  </div>
+  
+
+  <div class="mb-3">
+    <label class="form-label">Participants</label>
+    <select name="participants" multiple size="6" class="form-select">
+      {% for contact in contacts %}
+      <option value="{{ contact.id }}">{{ contact.name }} ({{ contact.role }})</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <button class="btn btn-success">Save Meeting</button>
+</form>
+
+</div>
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/meetings";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+{% endblock %}

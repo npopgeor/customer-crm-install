@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<h2 class="mb-4">🔁 Recurring Meetings</h2>
+
+{% if meetings_today %}
+  <div class="alert alert-success">
+    <h5>🎉 Meetings happening today:</h5>
+    <ul>
+      {% for mt in meetings_today %}
+        <li><strong>{{ mt.title }}</strong> with {{ mt.host }} ({{ mt.customer.name }})</li>
+      {% endfor %}
+    </ul>
+  </div>
+{% endif %}
+
+<div class="d-flex justify-content-between mb-3">
+  <a href="{{ url_for('add_recurring_meeting') }}" class="btn btn-primary">➕ Add Recurring Meeting</a>
+</div>
+
+<form method="get" class="row g-2 align-items-end mb-4">
+  <div class="col-auto">
+    <label for="customerFilter" class="form-label mb-0">Filter by Customer:</label>
+  </div>
+  <div class="col-auto">
+    <select name="customer_id" id="customerFilter" class="form-select" onchange="this.form.submit()">
+      <option value="">All Customers</option>
+      {% for customer in customers %}
+      <option value="{{ customer.id }}" {% if customer.id == selected_customer_id %}selected{% endif %}>
+        {{ customer.name }}
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+</form>
+
+
+<table class="table table-hover table-bordered">
+  <thead class="table-dark">
+    <tr>
+      <th>Customer</th>
+      <th>Title</th>
+      <th>Host</th>
+      <th>Recurrence</th>
+      <th>Duration</th> <!-- ✅ New Column -->
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for meeting in meetings %}
+    <tr>
+      <td>{{ meeting.customer.name }}</td>
+      <td>{{ meeting.title }}</td>
+      <td>{{ meeting.host }}</td>
+      <td>{{ meeting.get_human_readable_recurrence() }}</td>
+      <td>{{ meeting.duration_minutes or '—' }} mins</td> <!-- ✅ Duration shown here -->
+      <td>
+        <a href="{{ url_for('edit_recurring_meeting', meeting_id=meeting.id) }}" class="btn btn-sm btn-outline-warning">✏️</a>
+        <a href="{{ url_for('delete_recurring_meeting', meeting_id=meeting.id) }}"
+           class="btn btn-sm btn-outline-danger"
+           onclick="return confirm('Are you sure you want to delete this meeting?');">🗑️</a>
+        <a href="{{ url_for('download_recurring_ics', meeting_id=meeting.id) }}"
+           class="btn btn-sm btn-success">📅 .ics</a>
+      </td>
+      
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+<a href="/" class="btn btn-link mt-3">⬅ Back to Home</a>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+{% endblock %}

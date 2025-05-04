@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2 class="mb-0">📝 Action Items</h2>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('add_action_item') }}" class="btn btn-primary">➕ Add New Item</a>
+    <a href="{{ url_for('export_action_items_csv', tab=active_tab or 'daily') }}" class="btn btn-outline-secondary" id="exportCsvButton">📤 Export CSV</a>
+  </div>
+</div>
+
+
+<!-- Filter by customer -->
+<div class="mb-4">
+  <form method="get" action="{{ url_for('action_item_list') }}" class="row g-2 align-items-end" id="filterForm">
+    <input type="hidden" name="tab" id="currentTabInput" value="{{ active_tab or 'daily' }}">
+    <div class="col-auto">
+      <label for="customerFilter" class="form-label mb-0">Filter by Customer:</label>
+    </div>
+    <div class="col-auto">
+      <select name="customer_id" id="customerFilter" class="form-select" onchange="this.form.submit()">
+        <option value="">All Customers</option>
+        {% for customer in all_customers %}
+        <option value="{{ customer.id }}" {% if selected_customer_id == customer.id|string %}selected{% endif %}>
+          {{ customer.name }}
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+  </form>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-4" id="aiTab" role="tablist">
+  <li class="nav-item" role="presentation">
+    <a class="nav-link {% if active_tab == 'daily' %}active{% endif %}" id="daily-tab" data-bs-toggle="tab" href="#daily" role="tab">📆 Day-to-Day</a>
+  </li>
+  <li class="nav-item" role="presentation">
+    <a class="nav-link {% if active_tab == 'strategic' %}active{% endif %}" id="strategic-tab" data-bs-toggle="tab" href="#strategic" role="tab">🌟 Strategic</a>
+  </li>
+</ul>
+
+<div class="tab-content" id="aiTabContent">
+  <!-- Day-to-Day Tab -->
+  <div class="tab-pane {% if active_tab == 'daily' %}show active{% endif %}" id="daily" role="tabpanel">
+    {% set items = daily_items %}
+    {% include 'action_item_table.html' %}
+  </div>
+
+  <!-- Strategic Tab -->
+  <div class="tab-pane {% if active_tab == 'strategic' %}show active{% endif %}" id="strategic" role="tabpanel">
+    {% set items = strategic_items %}
+    {% include 'action_item_table.html' %}
+  </div>
+</div>
+
+<a href="/" class="btn btn-link mt-4">⬅ Back to Home</a>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Make rows clickable
+    document.querySelectorAll("tr.clickable-row").forEach((row) => {
+      row.addEventListener("click", (e) => {
+        if (!e.target.closest("a")) {
+          window.location = row.getAttribute("data-href");
+        }
+      });
+    });
+
+    // Update hidden input and export link when tab changes
+    const tabInput = document.getElementById("currentTabInput");
+    const exportButton = document.getElementById("exportCsvButton");
+
+    if (tabInput && exportButton) {
+      document.querySelectorAll('a[data-bs-toggle="tab"]').forEach((tab) => {
+        tab.addEventListener("shown.bs.tab", (e) => {
+          const newTabId = e.target.getAttribute("href").replace('#', '');
+          tabInput.value = newTabId;
+          exportButton.href = `/action_items/export_csv?tab=${newTabId}`;
+        });
+      });
+    }
+  });
+  
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+
+
+{% endblock %}

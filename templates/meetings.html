@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2 class="mb-4">📅 Past Meetings & Notes</h2>
+<a href="/meetings/add" class="btn btn-primary mb-3">➕ Add Past Meeting & Notes</a>
+
+<form id="meetingFilterForm" class="row g-2 align-items-end mb-4">
+  <div class="col-auto">
+    <label for="customerFilter" class="form-label mb-0">Filter by Customer:</label>
+  </div>
+  <div class="col-auto">
+    <select id="customerFilter" name="customer_id" class="form-select">
+      <option value="">All Customers</option>
+      {% for customer in customers %}
+        <option value="{{ customer.id }}" {% if selected_customer_id == customer.id %}selected{% endif %}>
+          {{ customer.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-auto">
+    <input type="text" id="searchQuery" name="q" value="{{ search_query }}" class="form-control" placeholder="Search meetings...">
+  </div>
+</form>
+
+
+
+
+<table class="table table-hover table-bordered align-middle">
+  <thead class="table-dark">
+    <tr>
+      <th>Date</th>
+      <th>Customer</th>
+      <th>Title</th>
+      <th>Host</th>
+      <th style="width: 220px;">Notes</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for meeting in meetings %}
+    <tr>
+      <td>{{ meeting.date }}</td>
+      <td>{{ meeting.customer.name }}</td>
+      <td>{{ meeting.title }}</td>
+      <td>{{ meeting.host }}</td>
+      <td>
+        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#noteRow{{ meeting.id }}">
+          Show Notes
+        </button>
+      </td>
+      <td>
+        <a href="/meetings/edit/{{ meeting.id }}" class="btn btn-sm btn-outline-warning">✏️</a>
+        <a href="/meetings/delete/{{ meeting.id }}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure you want to delete this meeting?');">🗑️</a>
+      </td>
+    </tr>
+
+    <!-- Expanded Notes Row (separate row) -->
+    <tr class="collapse bg-light" id="noteRow{{ meeting.id }}">
+      <td colspan="6">
+        <div class="p-3" style="white-space: pre-line;">
+          {{ meeting.notes }}
+        </div>
+      </td>
+    </tr>
+    {% endfor %}
+
+  </tbody>
+</table>
+
+<script>
+  const form = document.getElementById('meetingFilterForm');
+  const customerFilter = document.getElementById('customerFilter');
+  const searchQuery = document.getElementById('searchQuery');
+
+  customerFilter.addEventListener('change', () => form.submit());
+
+  let typingTimer;
+  searchQuery.addEventListener('input', () => {
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => form.submit(), 8000); // ⏱️ delay to avoid too many reloads
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
+      }
+    });
+  });
+
+
+</script>
+
+
+<a href="/" class="btn btn-link mt-3">⬅ Back to Home</a>
+{% endblock %}

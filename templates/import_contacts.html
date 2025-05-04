@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2 class="mb-4">📥 Import Contacts from CSV</h2>
+<form method="POST" enctype="multipart/form-data">
+  <div class="mb-3">
+    <label class="form-label">Choose CSV File</label>
+    <input type="file" name="csv_file" accept=".csv" class="form-control" required>
+  </div>
+  <button class="btn btn-success">Import</button>
+</form>
+<a href="{{ url_for('contact_list') }}" class="btn btn-link mt-3">⬅ Back to Contact List</a>
+{% endblock %}

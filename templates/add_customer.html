@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+{% block content %}
+  <h2 class="mb-4">🏢 Add New Customer</h2>
+  <form method="POST">
+    <div class="mb-3">
+      <label class="form-label">Customer Name <span class="text-danger">*</span></label>
+      <input name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">CX Services (Placeholder)</label>
+      <textarea name="cx_services" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Additional Notes</label>
+      <textarea name="notes" class="form-control"></textarea>
+    </div>
+
+    <button class="btn btn-success">Save</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<h2 class="mb-3">🏢 Customers</h2>
+<div class="mb-4">
+  <a href="{{ url_for('add_customer') }}" class="btn btn-primary">➕ Add New Customer</a>
+</div>
+
+<div class="table-responsive shadow-sm rounded border">
+  <table class="table table-hover align-middle mb-0">
+    <thead class="table-light text-nowrap">
+      <tr class="text-secondary">
+        <th>Customer</th>
+        <th style="width: 30%;">Notes</th>
+        <th class="text-center">Open Action Items</th>
+        <th class="text-center">Meeting Notes</th>
+        <th class="text-center">Recurring Meetings</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for customer in customers %}
+      <tr>
+        <td class="fw-semibold">
+          <a href="{{ url_for('customer_detail', id=customer.id) }}">
+            {{ customer.name }}
+          </a>
+        </td>
+        <td>
+          <span class="d-inline-block text-truncate" style="max-width: 400px;" title="{{ customer.notes }}">
+            {{ customer.notes }}
+          </span>
+        </td>
+        <td class="text-center">
+          <a href="{{ url_for('action_item_list') }}?customer_id={{ customer.id }}" 
+             class="btn btn-outline-danger fw-bold py-2 px-3 fs-5"
+             title="View open action items">
+            {{ customer.action_items | selectattr('completed', 'equalto', False) | list | length }}
+          </a>
+        </td>
+        <td class="text-center">
+          <a href="{{ url_for('meeting_list') }}?customer_id={{ customer.id }}" 
+             class="btn btn-outline-secondary fw-bold py-2 px-3 fs-5"
+             title="View meeting notes">
+            {{ customer.meetings | length }}
+          </a>
+        </td>
+        <td class="text-center">
+          <a href="{{ url_for('recurring_meeting_list') }}?customer_id={{ customer.id }}"
+             class="btn btn-outline-info fw-bold py-2 px-3 fs-5"
+             title="View recurring meetings">
+            {{ customer.recurring_meetings | length }}
+          </a>
+        </td>
+        
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<a href="/" class="btn btn-link mt-4">⬅ Back to Home</a>
+
+{% endblock %}

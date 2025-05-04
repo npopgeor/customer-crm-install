@@ -1,0 +1,136 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold">📂 {{ division.name }}</h2>
+    <a href="{{ url_for('customer_detail', id=division.customer_id) }}" class="btn btn-sm btn-outline-secondary">⬅ Back to Customer</a>
+  </div>
+
+  <div class="row g-4">
+    <!-- Contacts -->
+    <div class="col-12">
+      <div class="card p-3 h-100">
+        <h5>👥 Associated Contacts</h5>
+        {% if division.contacts %}
+          <a class="text-primary" data-bs-toggle="collapse" href="#contactTree">Show structure</a>
+          <div class="collapse mt-2" id="contactTree">
+            <ul style="word-break: break-word;">
+              {% macro render_tree(contact, seen=[]) -%}
+                {% if contact.id not in seen %}
+                  {% set _ = seen.append(contact.id) %}
+                  <li>
+                    👤 <strong>{{ contact.name }}</strong> – <span class="text-muted">{{ contact.role }}</span>
+                    {% if contact.email %} – <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>{% endif %}
+                    {% if contact.subordinates %}
+                      <ul class="mt-2 ms-4">
+                        {% for sub in contact.subordinates %}
+                          {{ render_tree(sub, seen) }}
+                        {% endfor %}
+                      </ul>
+                    {% endif %}
+                  </li>
+                {% endif %}
+              {%- endmacro %}
+              {% for contact in division.contacts if not contact.reports_to %}
+                {{ render_tree(contact) }}
+              {% endfor %}
+            </ul>
+          </div>
+        {% else %}
+          <p class="text-muted">No contacts.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Opportunities -->
+    <div class="col-12">
+      <div class="card p-3 h-100">
+        <h5>💼 Opportunities</h5>
+        {% if division.opportunities %}
+          <ul>
+            {% for opp in division.opportunities %}
+              <li>{{ opp.title }} – {{ opp.stage }} ({{ opp.value }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No opportunities for this division.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Technologies -->
+    <div class="col-12">
+      <div class="card p-3 h-100">
+        <h5>⚙️ Technologies</h5>
+        {% if division.technologies %}
+          <ul>
+            {% for tech in division.technologies %}
+              <li>{{ tech.name }} – {{ tech.discount_level }}% ({{ tech.notes }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No technologies linked to this division.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="col-12">
+      <div class="card p-3 h-100">
+        <h5>🛠 Projects</h5>
+        {% if division.projects %}
+          <ul>
+            {% for project in division.projects %}
+              <li>{{ project.name }} – {{ project.status }} ({{ project.owner }})</li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <p class="text-muted">No projects assigned to this division.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Attachments -->
+    <div class="col-12">
+      <div class="card p-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">📎 Division Attachments</h5>
+          <form method="POST" action="{{ url_for('upload_division_document', division_id=division.id) }}" enctype="multipart/form-data" class="d-flex">
+            <input type="file" name="files" multiple class="form-control form-control-sm me-2" required>
+            <button type="submit" class="btn btn-sm btn-outline-primary">Upload</button>
+          </form>
+        </div>
+        <ul class="mb-0">
+          {% if division.documents %}
+            {% for doc in division.documents %}
+              <li><a href="{{ url_for('uploaded_file', filename=doc.filename) }}" target="_blank">{{ doc.filename }}</a>
+                <small class="text-muted"> — uploaded {{ doc.uploaded_at.strftime('%b %d, %Y') }}</small></li>
+            {% endfor %}
+          {% else %}
+            <li class="text-muted">No attachments uploaded yet.</li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Sub-Divisions -->
+    {% if division.subdivisions %}
+    <div class="col-12">
+      <div class="card p-3">
+        <h5>🧹 Sub-Divisions</h5>
+        <ul class="list-group">
+          {% for sub in division.subdivisions %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+              {{ sub.name }}
+              <a href="{{ url_for('division_detail', division_id=sub.id) }}" class="btn btn-sm btn-outline-secondary">🔍 View</a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

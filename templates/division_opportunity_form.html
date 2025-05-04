@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<h2 class="mb-4">{% if opportunity %}Edit{% else %}Add{% endif %} Opportunity</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Title</label>
+    <input type="text" name="title" class="form-control" value="{{ opportunity.title if opportunity else '' }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Value</label>
+    <input type="text" name="value" class="form-control" value="{{ opportunity.value if opportunity else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Stage</label>
+    <input type="text" name="stage" class="form-control" value="{{ opportunity.stage if opportunity else '' }}">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Notes</label>
+    <textarea name="notes" class="form-control" arows="3">{{ opportunity.notes if opportunity else '' }}</textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">💾 Save</button>
+  <a href="{{ url_for('division_detail', division_id=opportunity.division_id if opportunity else division_id) }}" class="btn btn-secondary">Cancel</a>
+</form>
+
+{% endblock %}

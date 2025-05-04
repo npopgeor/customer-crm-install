@@ -1,0 +1,146 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #eef2f3, #8e9eab);
+  }
+html {
+  font-size: 17px; /* or try 18px for more readability */
+}
+
+  /* Sidebar */
+  .sidebar {
+    width: 280px;
+    background-color: #f0e9e9;
+    padding: 20px;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.05);
+    z-index: 100;
+  }
+  
+  .sidebar h4 a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+  }
+  
+  .sidebar a.nav-link {
+    padding: 12px 12px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: background 0.3s ease, transform 0.1s;
+    color: #333;
+    background: #faf9f8;
+  }
+  
+  .sidebar a.nav-link:hover {
+    background: #ccd0d4;
+    transform: translateX(10px);
+  }
+  
+  .badge-right {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  /* Main Content */
+  .content {
+    flex-grow: 1;
+    padding: 20px;
+    background: #faf9f8;
+  }
+  
+  .container-xl {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  /* Forms & Buttons */
+  .form-control,
+  .btn-dark,
+  .btn-outline-secondary {
+    border-radius: 8px;
+  }
+  
+  .nav-link span.badge {
+    padding: 5px 10px;
+  }
+  
+  /* Action Items Table */
+  tr.clickable-row {
+    cursor: pointer;
+  }
+  
+  .action-table th,
+  .action-table td {
+    width: 120px;
+    vertical-align: middle;
+    white-space: normal;
+    word-break: break-word;
+  }
+  
+  .action-table td:nth-child(2),
+  .action-table th:nth-child(2) {
+    width: 640px;
+  }
+  
+  /* Contacts Table */
+  .fixed-table th,
+  .fixed-table td {
+    max-width: 160px;
+    width: 160px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+  }
+  
+  a:hover {
+    text-decoration: underline;
+    color: #0a58ca;
+  }
+  
+  .hidden-row {
+    display: none !important;
+  }
+  
+  /* Tree View (Customer Detail) */
+  .tree,
+  .tree ul {
+    list-style-type: none;
+    padding-left: 1rem;
+  }
+  
+  .tree li {
+    margin: 0.3rem 0;
+  }
+  
+  .tree ul {
+    margin-left: 1rem;
+    border-left: 1px solid #ccc;
+  }
+  
+  /* Universal Card Hover */
+  .card:hover {
+    transform: translateY(-4px);
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+  
+.table-responsive {
+  overflow-x: auto;
+}
+
+table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+th, td {
+  word-wrap: break-word;
+  white-space: normal;
+}

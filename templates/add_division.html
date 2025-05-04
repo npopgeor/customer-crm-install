@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="container py-4">
+  <h2 class="mb-4">➕ Add New Division</h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    <div class="mb-3">
+      <label for="divisionName" class="form-label">Division Name <span class="text-danger">*</span></label>
+      <input type="text" name="name" id="divisionName" class="form-control" required>
+    </div>
+
+    <button type="submit" class="btn btn-success">💾 Save Division</button>
+    <a href="{{ url_for('customer_detail', id=customer.id) }}" class="btn btn-link">⬅ Cancel</a>
+</form>
+</div>
+
+{% endblock %}

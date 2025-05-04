@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+{% block content %}
+<h2 class="mb-4">➕ Add Action Item</h2>
+<form method="POST">
+  <div class="mb-3">
+    <label class="form-label">Date <span class="text-danger">*</span></label>
+    <input type="date" name="date" class="form-control" value="{{ current_date }}" required>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Detail <span class="text-danger">*</span></label>
+    <textarea name="detail" class="form-control" required></textarea>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Customer <span class="text-danger">*</span></label>
+    <select name="customer_id" class="form-select" required>
+      {% for customer in customers %}
+      <option value="{{ customer.id }}">{{ customer.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Customer Contact</label>
+    <input name="customer_contact" class="form-control">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">Cisco Contact</label>
+    <input name="cisco_contact" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label class="form-label">Category</label>
+    <select name="category" class="form-select">
+      <option value="daily" selected>📆 Day-to-Day</option>
+      <option value="strategic">🌟 Strategic</option>
+    </select>
+  </div>
+
+  <div class="form-check mb-3">
+    <input type="checkbox" name="completed" class="form-check-input" id="completedCheck">
+    <label class="form-check-label" for="completedCheck">Completed</label>
+  </div>
+  <button class="btn btn-success">Add Item</button>
+</form>
+</div>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/action_items";
+        }, 100);
+      }
+    });
+  });
+
+</script>
+{% endblock %}
