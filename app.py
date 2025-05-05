@@ -12,6 +12,7 @@ import re
 import logging
 from threading import Thread
 
+
 #os.makedirs('backup', exist_ok=True)
 
 from flask import send_file, abort
@@ -71,6 +72,12 @@ logging.basicConfig(
 
 def log_change(action: str, target: str):
     logging.info(f"[{DEVICE_NAME}] {action} → {target}")
+
+COLUMNS = [
+    "Enterprise Switching", "Internet Infrastructure", "Data Center Networking",
+    "Enterprise Routing", "Security", "Wireless", "Cisco Compute",
+    "Network Assurance", "Collaboration", "IOT", "Meraki"
+]
 
 
 db = SQLAlchemy(app)
@@ -399,6 +406,18 @@ class FileIndex(db.Model):
     filename = db.Column(db.String(200), nullable=False)
     parent_folder = db.Column(db.String(300))
     last_indexed = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class HeatmapCell(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customer.id'), nullable=False)
+    column_name = db.Column(db.String(128), nullable=False)   # e.g., "Security", "Wireless"
+    color = db.Column(db.String(20), nullable=True)           # e.g., "red", "yellow", "green"
+    text = db.Column(db.String(255), nullable=True)           # editable cell content
+
+    __table_args__ = (
+        db.UniqueConstraint('customer_id', 'column_name', name='_customer_column_uc'),
+    )
 
 
 # --------------------- FUNCTIONS ---------------------
@@ -2195,6 +2214,70 @@ def dashboard():
         meetings_today=meetings_today,
         open_action_customers=open_action_customers  # ✅ pass list instead of bool
     )
+
+#------------------ HEATMAP ROUTES ---------------------
+@app.route('/heatmap')
+def heatmap():
+    customers = Customer.query.all()
+    heatmap_data = []
+
+    for customer in customers:
+        row = {"name": customer.name, "data": []}
+        for column in COLUMNS:
+            cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
+            if cell and (cell.color or cell.text):  # Only include if there's meaningful data
+                row["data"].append({"color": cell.color, "text": cell.text})
+            else:
+                row["data"].append(None)  # Mark it as empty, not a fake dict
+        heatmap_data.append(row)
+
+    return render_template("heatmap.html", customers=heatmap_data, columns=COLUMNS)
+
+
+@app.route('/save_heatmap', methods=['POST'])
+def save_heatmap():
+    raw_data = request.form.get('heatmap_data', '')
+
+    for line in raw_data.strip().split('\n'):
+        if not line:
+            continue
+
+        try:
+            customer_name, cells_raw = line.split('||')
+            customer = Customer.query.filter_by(name=customer_name.strip()).first()
+            if not customer:
+                continue
+
+            cell_values = cells_raw.split('|')
+            for i, value in enumerate(cell_values):
+                color, text = value.split('::', 1)
+                column = COLUMNS[i]
+                cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
+                if not cell:
+                    cell = HeatmapCell(customer_id=customer.id, column_name=column)
+
+                color = color.strip()
+                text = text.strip()
+
+                if color or text:
+                    cell.color = color
+                    cell.text = text
+                    db.session.add(cell)
+                elif cell:
+                    db.session.delete(cell)  # Clean up blank rows if they existed before
+
+        except Exception as e:
+            print(f"⚠️ Error parsing line: {line}\n{e}")
+            continue
+
+    db.session.commit()
+    return redirect(url_for('heatmap', msg='✅ Heatmap saved!'))
+
+@app.route('/reset_heatmap')
+def reset_heatmap():
+    HeatmapCell.query.delete()
+    db.session.commit()
+    return redirect(url_for('heatmap', msg='🧹 Heatmap reset — all cells cleared!'))
 
 
 # --------------------- MAIN ---------------------

@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+{% block content %}
+
+<div class="container mt-4">
+  <h2 class="mb-4">🔥 Customer Technology Heatmap</h2>
+
+  {% if request.args.get('msg') %}
+    <div class="alert alert-info">{{ request.args.get('msg') }}</div>
+  {% endif %}
+
+  <div class="table-responsive">
+    <table class="table table-bordered text-center align-middle" id="heatmapTable">
+      <thead class="table-dark">
+        <tr>
+          <th>Customer</th>
+          {% for col in columns %}
+            <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for customer in customers %}
+        <tr>
+          <td><strong>{{ customer.name }}</strong></td>
+          {% for cell in customer.data %}
+            {% if cell %}
+            <td class="heatmap-cell {{ cell['color'] }}" contenteditable="true" onclick="cycleColor(this)">
+                {{ cell['text'] }}
+            </td>
+            {% else %}
+            <td class="heatmap-cell" contenteditable="true" onclick="cycleColor(this)"></td>
+            {% endif %}
+        
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="mt-3 text-end">
+      <form method="POST" action="{{ url_for('save_heatmap') }}">
+        <input type="hidden" name="heatmap_data" id="heatmapDataInput">
+        <button class="btn btn-success" type="submit" onclick="prepareFormData()">Save</button>
+      </form> 
+    </div>
+  </div>
+</div>
+
+<style>
+  .heatmap-cell {
+    min-width: 120px;
+    height: 40px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.2s ease;
+  }
+  .red    { background-color: #f87171; }   /* 🔴 */
+  .yellow { background-color: #facc15; }   /* 🟡 */
+  .green  { background-color: #4ade80; }   /* 🟢 */
+</style>
+
+<script>
+  function cycleColor(cell) {
+    const classes = ['red', 'yellow', 'green'];
+    let current = classes.findIndex(c => cell.classList.contains(c));
+    cell.classList.remove(...classes);
+
+    if (current === -1) {
+      cell.classList.add('red');
+    } else if (current === 0) {
+      cell.classList.add('yellow');
+    } else if (current === 1) {
+      cell.classList.add('green');
+    }
+  }
+
+  function prepareFormData() {
+    const rows = document.querySelectorAll('#heatmapTable tbody tr');
+    const output = [];
+
+    rows.forEach(row => {
+      const customerName = row.cells[0].innerText.trim();
+      const rowData = [];
+
+      for (let i = 1; i < row.cells.length; i++) {
+        const cell = row.cells[i];
+        const color = ['red', 'yellow', 'green'].find(c => cell.classList.contains(c)) || '';
+        const text = cell.innerText.trim();
+        rowData.push(color + '::' + text);
+      }
+
+      output.push(customerName + '||' + rowData.join('|'));
+    });
+
+    document.getElementById('heatmapDataInput').value = output.join('\n');
+  }
+</script>
+
+{% endblock %}

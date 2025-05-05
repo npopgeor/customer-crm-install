@@ -4,9 +4,37 @@
  * Debug mode: on
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-✅ Backup successful: account_team_20250503_222046.db
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-✅ Backup successful: account_team_20250503_222612.db
-/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
-  warnings.warn('resource_tracker: There appear to be %d '
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+⚠️ Error parsing line: Riot Games||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d28760>' is not persisted
+⚠️ Error parsing line: Viasat||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d28760>' is not persisted
+⚠️ Error parsing line: Roblox||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d28760>' is not persisted
+⚠️ Error parsing line: UMG||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110c43a30>' is not persisted
+⚠️ Error parsing line: Boingo||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110c43a30>' is not persisted
+⚠️ Error parsing line: Ziply||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110c43a30>' is not persisted
+⚠️ Error parsing line: SparkLight (CableOne)||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110c43a30>' is not persisted
+⚠️ Error parsing line: Riot Games||::etetet|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
+⚠️ Error parsing line: Viasat||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
+⚠️ Error parsing line: Roblox||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
+⚠️ Error parsing line: UMG||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
+⚠️ Error parsing line: Boingo||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
+⚠️ Error parsing line: Ziply||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
+⚠️ Error parsing line: SparkLight (CableOne)||::|::|::|::|::|::|::|::|::|::|::
+Instance '<HeatmapCell at 0x110d2bd00>' is not persisted
