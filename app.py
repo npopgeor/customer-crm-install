@@ -74,9 +74,9 @@ def log_change(action: str, target: str):
     logging.info(f"[{DEVICE_NAME}] {action} → {target}")
 
 COLUMNS = [
-    "Enterprise Switching", "Internet Infrastructure", "Data Center Networking",
-    "Enterprise Routing", "Security", "Wireless", "Cisco Compute",
-    "Network Assurance", "Collaboration", "IOT", "Meraki"
+    "Enterprise Switching", "Internet Infrastructure", "DC Networking",
+    "Enterprise Routing", "Security", "Wireless", "Compute",
+    "Assurance", "Collaboration", "IOT", "Meraki"
 ]
 
 
@@ -2225,10 +2225,10 @@ def heatmap():
         row = {"name": customer.name, "data": []}
         for column in COLUMNS:
             cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
-            if cell and (cell.color or cell.text):  # Only include if there's meaningful data
+            if cell and (cell.color or cell.text):
                 row["data"].append({"color": cell.color, "text": cell.text})
             else:
-                row["data"].append(None)  # Mark it as empty, not a fake dict
+                row["data"].append(None)
         heatmap_data.append(row)
 
     return render_template("heatmap.html", customers=heatmap_data, columns=COLUMNS)
@@ -2239,7 +2239,7 @@ def save_heatmap():
     raw_data = request.form.get('heatmap_data', '')
 
     for line in raw_data.strip().split('\n'):
-        if not line:
+        if not line.strip():
             continue
 
         try:
@@ -2249,29 +2249,39 @@ def save_heatmap():
                 continue
 
             cell_values = cells_raw.split('|')
-            for i, value in enumerate(cell_values):
-                color, text = value.split('::', 1)
-                column = COLUMNS[i]
-                cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
-                if not cell:
-                    cell = HeatmapCell(customer_id=customer.id, column_name=column)
+            if len(cell_values) != len(COLUMNS):
+                continue
 
+            for i, value in enumerate(cell_values):
+                if '::' not in value:
+                    color, text = '', ''
+                else:
+                    color, text = value.split('::', 1)
+
+                column = COLUMNS[i]
                 color = color.strip()
                 text = text.strip()
 
-                if color or text:
-                    cell.color = color
-                    cell.text = text
-                    db.session.add(cell)
-                elif cell:
-                    db.session.delete(cell)  # Clean up blank rows if they existed before
+                existing_cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
 
-        except Exception as e:
-            print(f"⚠️ Error parsing line: {line}\n{e}")
+                if color or text:
+                    if existing_cell:
+                        existing_cell.color = color
+                        existing_cell.text = text
+                        db.session.add(existing_cell)
+                    else:
+                        new_cell = HeatmapCell(customer_id=customer.id, column_name=column, color=color, text=text)
+                        db.session.add(new_cell)
+                else:
+                    if existing_cell:
+                        db.session.delete(existing_cell)
+
+        except Exception:
             continue
 
     db.session.commit()
     return redirect(url_for('heatmap', msg='✅ Heatmap saved!'))
+
 
 @app.route('/reset_heatmap')
 def reset_heatmap():

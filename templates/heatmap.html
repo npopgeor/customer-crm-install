@@ -4,9 +4,17 @@
 <div class="container mt-4">
   <h2 class="mb-4">🔥 Customer Technology Heatmap</h2>
 
-  {% if request.args.get('msg') %}
-    <div class="alert alert-info">{{ request.args.get('msg') }}</div>
-  {% endif %}
+  <div class="d-flex justify-content-end gap-2 mt-4">
+    <form id="heatmapForm" method="POST" action="{{ url_for('save_heatmap') }}">
+      <input type="hidden" name="heatmap_data" id="heatmapDataInput">
+      <button class="btn btn-primary" type="submit" id="saveButton">💾 Save</button>
+    </form>
+  
+    <button class="btn btn-outline-danger" onclick="confirmReset()">🧹 Reset Heatmap</button>
+    <button class="btn btn-outline-secondary" onclick="exportCSV()">📤 Export CSV</button>
+  </div>
+
+  <hr class="my-4">
 
   <div class="table-responsive">
     <table class="table table-bordered text-center align-middle" id="heatmapTable">
@@ -16,6 +24,7 @@
           {% for col in columns %}
             <th>{{ col }}</th>
           {% endfor %}
+          <th>🔄</th>
         </tr>
       </thead>
       <tbody>
@@ -23,48 +32,105 @@
         <tr>
           <td><strong>{{ customer.name }}</strong></td>
           {% for cell in customer.data %}
-            {% if cell %}
-            <td class="heatmap-cell {{ cell['color'] }}" contenteditable="true" onclick="cycleColor(this)">
-                {{ cell['text'] }}
+            <td class="heatmap-cell {{ cell.color }}" contenteditable="true" onclick="cycleColor(this)">
+              {{ cell.text | default('') }}
             </td>
-            {% else %}
-            <td class="heatmap-cell" contenteditable="true" onclick="cycleColor(this)"></td>
-            {% endif %}
-        
           {% endfor %}
+         <!-- This is an HTML comment <td><button class="btn btn-sm btn-outline-warning" onclick="confirmResetLine(this)">Reset Line</button></td>-->
         </tr>
         {% endfor %}
       </tbody>
     </table>
 
-    <div class="mt-3 text-end">
-      <form method="POST" action="{{ url_for('save_heatmap') }}">
-        <input type="hidden" name="heatmap_data" id="heatmapDataInput">
-        <button class="btn btn-success" type="submit" onclick="prepareFormData()">Save</button>
-      </form> 
-    </div>
   </div>
-</div>
 
+
+
+  {% if request.args.get('msg') %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        {{ request.args.get('msg') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endif %}
+
+</div>
 <style>
-  .heatmap-cell {
-    min-width: 120px;
-    height: 40px;
-    cursor: pointer;
-    outline: none;
-    transition: background-color 0.2s ease;
-  }
-  .red    { background-color: #f87171; }   /* 🔴 */
-  .yellow { background-color: #facc15; }   /* 🟡 */
-  .green  { background-color: #4ade80; }   /* 🟢 */
-</style>
+    /* General table responsiveness */
+    .table-responsive {
+      overflow-x: auto;
+    }
+  
+    /* Smaller font for compact look */
+    table,
+    .table th,
+    .table td {
+      font-size: 13px;
+    }
+  
+    /* Allow headers to wrap instead of truncate */
+    .table thead th {
+      white-space: normal;
+      vertical-align: middle;
+      text-align: center;
+    }
+  
+    /* Fixed width for heatmap cells */
+    .heatmap-cell {
+      min-width: 120px;
+      height: 36px;
+      cursor: pointer;
+      outline: none;
+      transition: background-color 0.2s ease;
+      white-space: normal;
+      word-break: break-word;
+    }
+  
+    /* Reset Line button size */
+    .reset-btn {
+      font-size: 11px;
+      padding: 3px 8px;
+    }
+  
+    /* Heatmap colors */
+    .red    { background-color: #f87171 !important; }
+    .yellow { background-color: #facc15 !important; }
+    .green  { background-color: #4ade80 !important; }
+  
+    /* Save animation */
+    .pulse {
+      animation: pulseAnim 0.5s ease-out;
+    }
+  
+    @keyframes pulseAnim {
+      0%   { background-color: #d1fae5; }
+      100% { background-color: transparent; }
+    }
+  </style>
+  
+  
 
 <script>
+  function confirmResetLine(button) {
+    const confirmation = prompt("⚠️ Type 'yes,line' to confirm resetting this row only:");
+    if (confirmation === "yes,line") {
+        resetRow(button);
+    } else if (confirmation !== null) {
+        alert("❌ Row reset cancelled. Confirmation did not match.");
+    }
+  }
+  
+  function confirmReset() {
+    const userInput = prompt("⚠️ Type 'yes,reset' to confirm heatmap reset:");
+    if (userInput === "yes,reset") {
+        window.location.href = "{{ url_for('reset_heatmap') }}";
+    } else if (userInput !== null) {
+        alert("❌ Reset cancelled. Confirmation text did not match.");
+    }
+  }
   function cycleColor(cell) {
     const classes = ['red', 'yellow', 'green'];
     let current = classes.findIndex(c => cell.classList.contains(c));
     cell.classList.remove(...classes);
-
     if (current === -1) {
       cell.classList.add('red');
     } else if (current === 0) {
@@ -74,15 +140,51 @@
     }
   }
 
+  function resetRow(button) {
+    const row = button.closest('tr');
+    for (let i = 1; i < row.cells.length - 1; i++) {
+      row.cells[i].classList.remove('red', 'yellow', 'green');
+      row.cells[i].innerText = '';
+    }
+  }
+
+  function exportCSV() {
+    let csvContent = "Customer,{{ columns|join(',') }}\n";
+    document.querySelectorAll('#heatmapTable tbody tr').forEach(row => {
+      let rowValues = [row.cells[0].innerText.trim()];
+      for (let i = 1; i < row.cells.length - 1; i++) {
+        const text = row.cells[i].innerText.trim();
+        rowValues.push('"' + text + '"');
+      }
+      csvContent += rowValues.join(',') + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.setAttribute('href', URL.createObjectURL(blob));
+    link.setAttribute('download', 'heatmap_export.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  document.getElementById('saveButton').addEventListener('click', function(e) {
+    e.preventDefault();
+    prepareFormData();
+    document.getElementById('heatmapForm').submit();
+  });
+
   function prepareFormData() {
     const rows = document.querySelectorAll('#heatmapTable tbody tr');
     const output = [];
+
+    document.querySelectorAll('.heatmap-cell[contenteditable="true"]').forEach(cell => cell.blur());
 
     rows.forEach(row => {
       const customerName = row.cells[0].innerText.trim();
       const rowData = [];
 
-      for (let i = 1; i < row.cells.length; i++) {
+      for (let i = 1; i < row.cells.length - 1; i++) {
         const cell = row.cells[i];
         const color = ['red', 'yellow', 'green'].find(c => cell.classList.contains(c)) || '';
         const text = cell.innerText.trim();
@@ -93,6 +195,11 @@
     });
 
     document.getElementById('heatmapDataInput').value = output.join('\n');
+
+    document.querySelector('#heatmapTable').classList.add('pulse');
+    setTimeout(() => {
+      document.querySelector('#heatmapTable').classList.remove('pulse');
+    }, 600);
   }
 </script>
 
