@@ -2250,34 +2250,41 @@ def heatmap():
     heatmap_data = []
 
     for customer in customers:
-        row = {"name": customer.name, "data": []}
+        row = {
+            "id": customer.id,
+            "name": customer.name,
+            "data": []
+        }
         for column in COLUMNS:
             cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
             if cell and (cell.color or cell.text):
                 row["data"].append({"color": cell.color, "text": cell.text})
             else:
-                row["data"].append(None)
+                row["data"].append({"color": "", "text": ""})
         heatmap_data.append(row)
 
     return render_template("heatmap.html", customers=heatmap_data, columns=COLUMNS)
 
-
 @app.route('/save_heatmap', methods=['POST'])
 def save_heatmap():
     raw_data = request.form.get('heatmap_data', '')
+    print("📥 Saving Heatmap Data:")
+    print(raw_data)
 
     for line in raw_data.strip().split('\n'):
         if not line.strip():
             continue
 
         try:
-            customer_name, cells_raw = line.split('||')
-            customer = Customer.query.filter_by(name=customer_name.strip()).first()
+            customer_id_str, cells_raw = line.split('||')
+            customer = Customer.query.get(int(customer_id_str.strip()))
             if not customer:
+                print(f"❌ Customer not found with ID: {customer_id_str}")
                 continue
 
             cell_values = cells_raw.split('|')
             if len(cell_values) != len(COLUMNS):
+                print(f"⚠️ Column mismatch for customer ID {customer_id_str}")
                 continue
 
             for i, value in enumerate(cell_values):
@@ -2287,29 +2294,35 @@ def save_heatmap():
                     color, text = value.split('::', 1)
 
                 column = COLUMNS[i]
-                color = color.strip()
-                text = text.strip()
+                print(f"   - {column}: color={color.strip()}, text={text.strip()}")
 
                 existing_cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
 
                 if color or text:
                     if existing_cell:
-                        existing_cell.color = color
-                        existing_cell.text = text
+                        existing_cell.color = color.strip()
+                        existing_cell.text = text.strip()
                         db.session.add(existing_cell)
                     else:
-                        new_cell = HeatmapCell(customer_id=customer.id, column_name=column, color=color, text=text)
+                        new_cell = HeatmapCell(
+                            customer_id=customer.id,
+                            column_name=column,
+                            color=color.strip(),
+                            text=text.strip()
+                        )
                         db.session.add(new_cell)
                 else:
                     if existing_cell:
                         db.session.delete(existing_cell)
 
-        except Exception:
+        except Exception as e:
+            print(f"❌ Exception occurred while processing line: {line}")
+            print(f"   Error: {e}")
             continue
 
     db.session.commit()
+    print("✅ DB commit completed")
     return redirect(url_for('heatmap', msg='✅ Heatmap saved!'))
-
 
 @app.route('/reset_heatmap')
 def reset_heatmap():

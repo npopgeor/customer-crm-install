@@ -1,6 +1,5 @@
 {% extends 'layout.html' %}
 {% block content %}
-
 <div class="container mt-4">
   <h2 class="mb-4">🔥 Customer Technology Heatmap</h2>
 
@@ -9,7 +8,6 @@
       <input type="hidden" name="heatmap_data" id="heatmapDataInput">
       <button class="btn btn-primary" type="submit" id="saveButton">💾 Save</button>
     </form>
-  
     <button class="btn btn-outline-danger" onclick="confirmReset()">🧹 Reset Heatmap</button>
     <button class="btn btn-outline-secondary" onclick="exportCSV()">📤 Export CSV</button>
   </div>
@@ -29,115 +27,105 @@
       </thead>
       <tbody>
         {% for customer in customers %}
-        <tr>
-          <td><strong>{{ customer.name }}</strong></td>
-          {% for cell in customer.data %}
-            <td class="heatmap-cell {{ cell.color }}" contenteditable="true" onclick="cycleColor(this)">
-              {{ cell.text | default('') }}
+          <tr data-customer-id="{{ customer.id }}">
+            <td><strong>{{ customer.name }}</strong></td>
+            {% for cell in customer.data %}
+              <td class="heatmap-cell {{ cell.color }}" contenteditable="true" onclick="cycleColor(this)">
+                {{ cell.text }}
+              </td>
+            {% endfor %}
+            <td>
+              <button class="btn btn-sm btn-outline-secondary reset-btn" onclick="confirmResetLine(this)">Reset</button>
             </td>
-          {% endfor %}
-         <!-- This is an HTML comment <td><button class="btn btn-sm btn-outline-warning" onclick="confirmResetLine(this)">Reset Line</button></td>-->
-        </tr>
+          </tr>
         {% endfor %}
       </tbody>
     </table>
-
   </div>
-
-
 
   {% if request.args.get('msg') %}
     <div class="alert alert-success alert-dismissible fade show" role="alert">
         {{ request.args.get('msg') }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-    {% endif %}
-
+  {% endif %}
 </div>
+
 <style>
-    /* General table responsiveness */
-    .table-responsive {
-      overflow-x: auto;
-    }
-  
-    /* Smaller font for compact look */
-    table,
-    .table th,
-    .table td {
-      font-size: 13px;
-    }
-  
-    /* Allow headers to wrap instead of truncate */
-    .table thead th {
-      white-space: normal;
-      vertical-align: middle;
-      text-align: center;
-    }
-  
-    /* Fixed width for heatmap cells */
-    .heatmap-cell {
-      min-width: 120px;
-      height: 36px;
-      cursor: pointer;
-      outline: none;
-      transition: background-color 0.2s ease;
-      white-space: normal;
-      word-break: break-word;
-    }
-  
-    /* Reset Line button size */
-    .reset-btn {
-      font-size: 11px;
-      padding: 3px 8px;
-    }
-  
-    /* Heatmap colors */
-    .red    { background-color: #f87171 !important; }
-    .yellow { background-color: #facc15 !important; }
-    .green  { background-color: #4ade80 !important; }
-  
-    /* Save animation */
-    .pulse {
-      animation: pulseAnim 0.5s ease-out;
-    }
-  
-    @keyframes pulseAnim {
-      0%   { background-color: #d1fae5; }
-      100% { background-color: transparent; }
-    }
-  </style>
-  
-  
+  /* General table responsiveness */
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  /* Smaller font for compact look */
+  table,
+  .table th,
+  .table td {
+    font-size: 13px;
+  }
+
+  /* Allow headers to wrap instead of truncate */
+  .table thead th {
+    white-space: normal;
+    vertical-align: middle;
+    text-align: center;
+  }
+
+  /* Fixed width for heatmap cells */
+  .heatmap-cell {
+    min-width: 120px;
+    height: 36px;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.2s ease;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  /* Reset Line button size */
+  .reset-btn {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+
+  /* Heatmap colors */
+  .red    { background-color: #f87171 !important; }
+  .yellow { background-color: #facc15 !important; }
+  .green  { background-color: #4ade80 !important; }
+
+  /* Save animation */
+  .pulse {
+    animation: pulseAnim 0.5s ease-out;
+  }
+
+  @keyframes pulseAnim {
+    0%   { background-color: #d1fae5; }
+    100% { background-color: transparent; }
+  }
+</style>
+
+
 
 <script>
-  function confirmResetLine(button) {
-    const confirmation = prompt("⚠️ Type 'yes,line' to confirm resetting this row only:");
-    if (confirmation === "yes,line") {
-        resetRow(button);
-    } else if (confirmation !== null) {
-        alert("❌ Row reset cancelled. Confirmation did not match.");
-    }
-  }
-  
-  function confirmReset() {
-    const userInput = prompt("⚠️ Type 'yes,reset' to confirm heatmap reset:");
-    if (userInput === "yes,reset") {
-        window.location.href = "{{ url_for('reset_heatmap') }}";
-    } else if (userInput !== null) {
-        alert("❌ Reset cancelled. Confirmation text did not match.");
-    }
-  }
   function cycleColor(cell) {
     const classes = ['red', 'yellow', 'green'];
     let current = classes.findIndex(c => cell.classList.contains(c));
     cell.classList.remove(...classes);
-    if (current === -1) {
-      cell.classList.add('red');
-    } else if (current === 0) {
-      cell.classList.add('yellow');
-    } else if (current === 1) {
-      cell.classList.add('green');
+    if (current === -1) cell.classList.add('red');
+    else if (current === 0) cell.classList.add('yellow');
+    else if (current === 1) cell.classList.add('green');
+  }
+
+  function confirmReset() {
+    const userInput = prompt("⚠️ Type 'yes,reset' to confirm heatmap reset:");
+    if (userInput === "yes,reset") {
+        window.location.href = "{{ url_for('reset_heatmap') }}";
     }
+  }
+
+  function confirmResetLine(button) {
+    const confirmation = prompt("⚠️ Type 'yes,line' to confirm resetting this row:");
+    if (confirmation === "yes,line") resetRow(button);
   }
 
   function resetRow(button) {
@@ -153,19 +141,40 @@
     document.querySelectorAll('#heatmapTable tbody tr').forEach(row => {
       let rowValues = [row.cells[0].innerText.trim()];
       for (let i = 1; i < row.cells.length - 1; i++) {
-        const text = row.cells[i].innerText.trim();
-        rowValues.push('"' + text + '"');
+        rowValues.push('"' + row.cells[i].innerText.trim() + '"');
       }
       csvContent += rowValues.join(',') + "\n";
     });
-
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    link.setAttribute('href', URL.createObjectURL(blob));
-    link.setAttribute('download', 'heatmap_export.csv');
+    link.href = URL.createObjectURL(blob);
+    link.download = "heatmap_export.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  }
+
+  function prepareFormData() {
+    const rows = document.querySelectorAll('#heatmapTable tbody tr');
+    const output = [];
+
+    rows.forEach(row => {
+      const customerId = row.getAttribute('data-customer-id');
+      const rowData = [];
+      for (let i = 1; i < row.cells.length - 1; i++) {
+        const cell = row.cells[i];
+        const color = ['red', 'yellow', 'green'].find(c => cell.classList.contains(c)) || '';
+        const text = cell.innerText.trim();
+        rowData.push(color + '::' + text);
+      }
+      output.push(customerId + '||' + rowData.join('|'));
+    });
+
+    document.getElementById('heatmapDataInput').value = output.join('\n');
+    document.querySelector('#heatmapTable').classList.add('pulse');
+    setTimeout(() => {
+      document.querySelector('#heatmapTable').classList.remove('pulse');
+    }, 600);
   }
 
   document.getElementById('saveButton').addEventListener('click', function(e) {
@@ -173,34 +182,5 @@
     prepareFormData();
     document.getElementById('heatmapForm').submit();
   });
-
-  function prepareFormData() {
-    const rows = document.querySelectorAll('#heatmapTable tbody tr');
-    const output = [];
-
-    document.querySelectorAll('.heatmap-cell[contenteditable="true"]').forEach(cell => cell.blur());
-
-    rows.forEach(row => {
-      const customerName = row.cells[0].innerText.trim();
-      const rowData = [];
-
-      for (let i = 1; i < row.cells.length - 1; i++) {
-        const cell = row.cells[i];
-        const color = ['red', 'yellow', 'green'].find(c => cell.classList.contains(c)) || '';
-        const text = cell.innerText.trim();
-        rowData.push(color + '::' + text);
-      }
-
-      output.push(customerName + '||' + rowData.join('|'));
-    });
-
-    document.getElementById('heatmapDataInput').value = output.join('\n');
-
-    document.querySelector('#heatmapTable').classList.add('pulse');
-    setTimeout(() => {
-      document.querySelector('#heatmapTable').classList.remove('pulse');
-    }, 600);
-  }
 </script>
-
 {% endblock %}
