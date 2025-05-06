@@ -88,10 +88,11 @@
     padding: 3px 8px;
   }
 
-  /* Heatmap colors */
-  .red    { background-color: #f87171 !important; }
-  .yellow { background-color: #facc15 !important; }
-  .green  { background-color: #4ade80 !important; }
+/* Heatmap colors: vivid and clear */
+.red    { background-color: #ff0000 !important; color: #fff; }  /* True red */
+.yellow { background-color: #ffff00 !important; color: #000; }  /* True yellow */
+.green  { background-color: #00cc00 !important; color: #fff; }  /* Vivid green */
+
 
   /* Save animation */
   .pulse {
@@ -181,6 +182,22 @@
     e.preventDefault();
     prepareFormData();
     document.getElementById('heatmapForm').submit();
+  });
+
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/dashboard";
+        }, 100);
+      }
+    });
   });
 </script>
 {% endblock %}

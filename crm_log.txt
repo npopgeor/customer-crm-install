@@ -6,43 +6,238 @@
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py:2280: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py:2284: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
   customer = Customer.query.get(int(customer_id_str.strip()))
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
 📥 Saving Heatmap Data:
-5||::|::|::|::|::|::|::|::|::|::|::
-8||::|::|red::|::|::|::|::|::|::|::|::
-1||::|::|::|::|::|::|::|::|::|::|::
-3||::|::|::|red::|::|::|::|::|::|::|::
-7||::|::|::|::|::|::|::|::|::|::|::
-4||::|::|::|red::|::|::|::|::|::|::|::
-2||::|::|::|::|::|::|::|::|::|::|::
-6||::|::|::|::|::|::|::|::|::|::|::
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|::|::|green::
+1||green::Meraki|::|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|::|::|green::
+3||red::|::|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|::|yellow::Mixed|red::|red::|yellow::|green::|red::|::|::|yellow::
+4||green::|::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|::|red::|red::
+2||yellow::Cisco/Juniper/Arista|::|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|::|green::IE3000|::
+6||red::|::|red::|red::|red::|red::|red::|red::|::|red::|red::
 ✅ DB commit completed
 📥 Saving Heatmap Data:
-5||::|::|::|::|::|::|::|::|::|::|::
-8||::|::|yellow::test|::|::|::|::|::|::|::|::
-1||::|::|::|::|::|::|::|::|::|::|::
-3||::|::|::|red::|::|::|::|::|::|::|::
-7||::|::|::|::|::|::|::|::|::|::|::
-4||::|::|::|red::|::|::|::|::|::|::|::
-2||::|::|::|::|::|::|::|::|::|::|::
-6||::|::|::|::|::|::|::|::|::|::|::
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In works
+(Juniper)|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: (Juniper)|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
 ✅ DB commit completed
 📥 Saving Heatmap Data:
-5||::|::|::|::|::|::|::|::|::|::|::
-8||::|::|yellow::test|::|::|::|::|::|::|::|::
-1||::|::|::|::|::|::|::|::|::|::|::
-3||::|::|::|red::|::|::|::|::|::|::|::
-7||::|::|::|::|::|::|::|::|::|::|::
-4||::|::|::|red::|::|::|::|::|::|::|::
-2||::|::|::|::|::|::|::|::|::|::|::
-6||::|::|::|::|::|::|::|::|::|::|::
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|red::|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
 ✅ DB commit completed
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py:2342: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
-  customer = Customer.query.get(cust_id)
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In works
+(Juniper)|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: (Juniper)|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|green::In works
+(Juniper)|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: (Juniper)|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In the works
+(Juniper)|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: (Juniper)|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|green::sadsad|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|::sadsad|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|red::sadsad|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|green::In the works
+Juniper|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: Juniper|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|red::sadsad|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In the works
+Juniper|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: Juniper|green::N9k|red::|red::|red::|red::|red::|::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|red::sadsad|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|green::s|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::sssss|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::sssss|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In the works|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In the works
+
+(Juniper)|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+⚠️ Column mismatch for customer ID 3
+❌ Exception occurred while processing line: (Juniper)|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+   Error: not enough values to unpack (expected 2, got 1)
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||green::Cisco|red::|yellow::|green::|red::|green::|red::|red::|red::|red::|green::
+8||green::Meraki|green::|green::|green::|red::|yellow::Meraki|yellow::In Works|red::|red::|::|green::
+1||green::Meraki|green::Cisco NCS>8k|yellow::In Works|green::|yellow::Misc|green::Meraki|yellow::In Works|green::1000 eyes|red::|::|green::
+3||red::|yellow::In the works Juniper|green::N9k|red::|red::|red::|red::|red::|red::|red::|red::
+7||yellow::Mixed|yellow::Mixed|yellow::Mixed|red::|red::|yellow::|green::|red::|yellow::Cisco Broadsoft|::|yellow::
+4||green::|yellow::|green::|yellow::Cisco today - losing|yellow::Duo + Comp|red::Lost to Juniper|red::|red::|red::Removing Cisco|red::|red::
+2||yellow::Cisco/Juniper/Arista|yellow::Cisco/Juniper|yellow::Cisco/HP|yellow::Cisco/Juniper|red::Fortinet/PAN|yellow::Mix|yellow::Cisco/Dell/HP|yellow::|yellow::Some Cisco|green::IE3000|::
+6||red::|green::|red::|red::|red::|red::|red::|red::|red::|red::|red::
+✅ DB commit completed

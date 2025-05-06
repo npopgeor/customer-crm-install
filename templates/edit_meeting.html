@@ -7,6 +7,13 @@
       <label class="form-label">Date</label>
       <input type="date" name="date" value="{{ meeting.date }}" class="form-control" required>
     </div>
+    <select name="customer_id" class="form-select">
+      {% for customer in customers %}
+        <option value="{{ customer.id }}" {% if customer.id == meeting.customer_id %}selected{% endif %}>
+          {{ customer.name }}
+        </option>
+      {% endfor %}
+    </select>
     <div class="mb-3">
       <label class="form-label">Title</label>
       <input name="title" value="{{ meeting.title }}" class="form-control" required>

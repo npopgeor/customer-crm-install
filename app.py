@@ -77,9 +77,9 @@ def log_change(action: str, target: str):
     logging.info(f"[{DEVICE_NAME}] {action} → {target}")
 
 COLUMNS = [
-    "Enterprise Switching", "Internet Infrastructure", "DC Networking",
+    "Enterprise Switching", "Internet Infra", "DC Networking",
     "Enterprise Routing", "Security", "Wireless", "Compute",
-    "Assurance", "Collaboration", "IOT", "Meraki"
+    "Assurance", "Collab", "IOT", "Meraki"
 ]
 
 
@@ -1899,15 +1899,19 @@ def add_meeting():
 @app.route('/meetings/edit/<int:meeting_id>', methods=['GET', 'POST'])
 def edit_meeting(meeting_id):
     meeting = Meeting.query.get_or_404(meeting_id)
+    customers = Customer.query.order_by(Customer.name).all()  # ⬅️ Needed for dropdown
+
     if request.method == 'POST':
         meeting.date = request.form['date']
         meeting.title = request.form['title']
         meeting.host = request.form['host']
         meeting.notes = request.form.get('notes')
+        meeting.customer_id = request.form.get('customer_id', type=int)  # ⬅️ Allow reassignment
         db.session.commit()
         log_change("Edited meeting", f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}")
         return redirect(url_for('meeting_list'))
-    return render_template('edit_meeting.html', meeting=meeting)
+
+    return render_template('edit_meeting.html', meeting=meeting, customers=customers)
 
 @app.route('/meetings/delete/<int:meeting_id>')
 def delete_meeting(meeting_id):

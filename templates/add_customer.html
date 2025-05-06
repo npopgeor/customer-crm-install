@@ -27,4 +27,24 @@
     <a href="{{ url_for('settings', tab='customers') }}" class="btn btn-secondary ms-2">Cancel</a>
 
   </form>
+
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keydown", function (event) {
+      if ((event.key === "Escape" || event.keyCode === 27) &&
+          document.activeElement.tagName !== "TEXTAREA" &&
+          document.activeElement.tagName !== "INPUT") {
+        
+        event.preventDefault(); // Prevent default Escape behavior (like modal close)
+        console.log("Forced redirect on Esc");
+
+        setTimeout(() => {
+          window.location.href = "/settings";
+        }, 100);
+      }
+    });
+  });
+</script>
+
 {% endblock %}
