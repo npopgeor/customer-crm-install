@@ -55,13 +55,16 @@ DISCOVERY_ROOT = ONEDRIVE_PATH
 BACKUP_SHARED_DIR = os.path.join(ONEDRIVE_PATH, "APP backup")
 BACKUP_LOCAL_DIR = os.path.join(os.getcwd(), "instance", "backup")
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
+LOGO_UPLOAD_FOLDER = os.path.join(app.root_path, "static", "logos")
 
+os.makedirs(LOGO_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{DATABASE_PATH}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['LOGO_UPLOAD_FOLDER'] = LOGO_UPLOAD_FOLDER
 
 CHANGE_LOG_FILE = os.path.join(os.environ.get("ONEDRIVE_PATH", "."), "APP", "change_log.txt")
 logging.basicConfig(
@@ -1000,14 +1003,13 @@ def add_partner():
         db.session.add(partner)
         log_change("Added partner", partner.name)
         db.session.commit()
+
+        if request.args.get('from') == 'settings':
+            return redirect(url_for('settings', tab='partners'))
         return redirect(url_for('partner_list'))
 
     return render_template('add_partner.html', customers=customers)
 
-@app.route('/partners/<int:partner_id>')
-def partner_detail(partner_id):
-    partner = Partner.query.get_or_404(partner_id)
-    return render_template('partner_detail.html', partner=partner)
 
 @app.route('/partners/edit/<int:partner_id>', methods=['GET', 'POST'])
 def edit_partner(partner_id):
@@ -1024,26 +1026,50 @@ def edit_partner(partner_id):
 
         db.session.commit()
         log_change("Edited partner", partner.name)
+
+        if request.args.get('from') == 'settings':
+            return redirect(url_for('settings', tab='partners'))
         return redirect(url_for('partner_list'))
 
     return render_template('edit_partner.html', partner=partner, customers=customers)
 
 
-@app.route('/partners/delete/<int:partner_id>')
+@app.route('/partners/delete/<int:partner_id>', methods=['POST'])
 def delete_partner(partner_id):
     partner = Partner.query.get_or_404(partner_id)
-    
-    # Disassociate the partner from any linked customers
+    confirm_name = request.form.get("confirm_name", "").strip()
+
+    if confirm_name != partner.name:
+        return redirect(url_for('settings', tab='partners', msg='confirm_failed'))
+
+    # Disassociate the partner from linked customers
     for customer in partner.customers:
         customer.partners.remove(partner)
-    
-    # Disassociate the partner from any contacts
+
+    # Disassociate the partner from contacts
     for contact in partner.contacts:
         contact.partner_id = None
+
     log_change("Deleted partner", partner.name)
     db.session.delete(partner)
     db.session.commit()
+
+    if request.args.get('from') == 'settings':
+        return redirect(url_for('settings', tab='partners', msg='deleted'))
+
     return redirect(url_for('partner_list'))
+
+    if request.args.get('from') == 'settings':
+        return redirect(url_for('settings', tab='partners'))
+    return redirect(url_for('partner_list'))
+
+
+@app.route('/partners/<int:partner_id>')
+def partner_detail(partner_id):
+    partner = Partner.query.get_or_404(partner_id)
+    return render_template('partner_detail.html', partner=partner)
+
+
 
 # --- CUSTOMER ROUTES ---
 # --- CUSTOMER ROUTES ---
@@ -1092,15 +1118,17 @@ def customer_detail(id):
         past_meetings=past_meetings,
         total_attachments=total_attachments
     )
-
 @app.route('/customers/add', methods=['GET', 'POST'])
 def add_customer():
     if request.method == 'POST':
+        customer_name = request.form['name']
         customer = Customer(
-            name=request.form['name'],
+            name=customer_name,
             cx_services=request.form.get('cx_services'),
             notes=request.form.get('notes')
         )
+
+        # Relationships
         partner_ids = request.form.getlist('partners')
         contact_ids = request.form.getlist('contacts')
         for pid in partner_ids:
@@ -1111,9 +1139,20 @@ def add_customer():
             customer.contacts.append(contact)
 
         db.session.add(customer)
-        log_change("Added customer", customer.name)
         db.session.commit()
 
+        # ✅ Save logo if uploaded
+        logo_file = request.files.get('logo')
+        if logo_file and logo_file.filename.lower().endswith('.png'):
+            safe_name = customer.name.replace(" ", "_").lower()
+            logo_path = os.path.join(app.config['LOGO_UPLOAD_FOLDER'], f"{safe_name}.png")
+            logo_file.save(logo_path)
+            print(f"✅ Saved logo to: {logo_path}")
+        else:
+            print("⚠️ No logo uploaded or wrong file type.")
+
+
+        # ✅ Optional division file handling...
         division_name = request.form.get('division_name')
         division_file = request.files.get('division_file')
         if division_name:
@@ -1125,11 +1164,14 @@ def add_customer():
             db.session.add(division)
             db.session.commit()
 
+        if request.args.get('from') == 'settings':
+            return redirect(url_for('settings', tab='customers'))
         return redirect(url_for('customer_list'))
 
     contacts = Contact.query.filter(Contact.customer_id == None, Contact.partner_id == None).all()
     partners = Partner.query.all()
     return render_template('add_customer.html', contacts=contacts, partners=partners)
+
 
 @app.route('/customers/edit/<int:id>', methods=['GET', 'POST'])
 def edit_customer(id):
@@ -1140,66 +1182,52 @@ def edit_customer(id):
         customer.cx_services = request.form.get('cx_services')
         customer.notes = request.form.get('notes')
 
+        # ✅ Handle logo upload
+        logo = request.files.get('logo')
+        if logo and logo.filename.endswith('.png'):
+            safe_name = customer.name.replace(" ", "_").lower() + ".png"
+            logo_path = os.path.join('static', 'logos', safe_name)
+            os.makedirs(os.path.dirname(logo_path), exist_ok=True)
+            logo.save(logo_path)
+
         log_change("Edited customer", customer.name)
         db.session.commit()
+
         return redirect(url_for('customer_detail', id=customer.id))
 
-    return render_template('edit_customer.html', customer=customer)
+    return render_template('edit_customer.html', customer=customer, available_contacts=Contact.query.all())
 
-@app.route('/customers/delete/<int:id>')
+@app.route('/customers/delete/<int:id>', methods=['POST'])
 def delete_customer(id):
     customer = Customer.query.get_or_404(id)
 
-    # Disassociate related foreign key references
+    # 🔒 Confirm typed name matches customer name
+    confirm_name = request.form.get("confirm_name", "").strip()
+    if confirm_name != customer.name:
+        return redirect(url_for("settings", tab="customers", msg="confirm_failed"))
+
+    # 🔄 Disassociate relationships
     for item in customer.action_items:
         item.customer_id = None
-
     for meeting in customer.meetings:
         meeting.customer_id = None
-
     for recurring in customer.recurring_meetings:
         recurring.customer_id = None
-
     for contact in customer.contacts:
         contact.customer_id = None
         contact.contact_type = "Unassigned"
-
     for division in customer.divisions:
         division.customer_id = None
-    
+
     log_change("Deleted customer", customer.name)
-    db.session.commit()  # commit disassociations first
-    
+    db.session.commit()  # commit disassociations
+
     db.session.delete(customer)
     db.session.commit()
+
+    if request.args.get("from") == "settings":
+        return redirect(url_for("settings", tab="customers", msg="deleted"))
     return redirect(url_for('customer_list'))
-
-def get_next_occurrence(meeting, today=None):
-    today = today or datetime.now()
-    current = meeting.start_datetime
-
-    if current >= today:
-        return current
-
-    while current.date() <= meeting.repeat_until:
-        if meeting.recurrence_pattern == 'daily':
-            current += timedelta(days=1)
-        elif meeting.recurrence_pattern == 'weekly':
-            current += timedelta(weeks=1)
-        elif meeting.recurrence_pattern == 'biweekly':
-            current += timedelta(weeks=2)
-        elif meeting.recurrence_pattern == 'monthly':
-            try:
-                current = current.replace(month=current.month + 1)
-            except ValueError:
-                break
-        else:
-            break
-
-        if current > today:
-            return current
-
-    return None
 
 
 @app.route('/customers/<int:id>/upload', methods=['POST'])
@@ -2171,7 +2199,7 @@ def inject_meetings_today():
 
 @app.route('/dashboard')
 def dashboard():
-    customers = Customer.query.all()
+    customers = Customer.query.order_by(Customer.name).all()
 
     customer_cards = []
     open_action_customers = []  # 🔥 list instead of just True/False
@@ -2218,7 +2246,7 @@ def dashboard():
 #------------------ HEATMAP ROUTES ---------------------
 @app.route('/heatmap')
 def heatmap():
-    customers = Customer.query.all()
+    customers = Customer.query.order_by(Customer.name).all()
     heatmap_data = []
 
     for customer in customers:
@@ -2288,6 +2316,22 @@ def reset_heatmap():
     HeatmapCell.query.delete()
     db.session.commit()
     return redirect(url_for('heatmap', msg='🧹 Heatmap reset — all cells cleared!'))
+
+
+
+#------------------ SETTINGS ROUTES ---------------------
+
+@app.route('/settings')
+def settings():
+    tab = request.args.get('tab', 'customers')  # default to 'customers'
+    customers = Customer.query.order_by(Customer.name).all()
+    partners = Partner.query.order_by(Partner.name).all()
+    return render_template('settings.html', tab=tab, customers=customers, partners=partners)
+
+
+
+
+
 
 
 # --------------------- MAIN ---------------------

@@ -1,14 +1,15 @@
 {% extends 'layout.html' %}
 {% block content %}
   <h2 class="mb-4">🏢 Add New Customer</h2>
-  <form method="POST">
+  <form method="POST" action="{{ url_for('add_customer') }}?from={{ request.args.get('from') }}" enctype="multipart/form-data">
+    
     <div class="mb-3">
       <label class="form-label">Customer Name <span class="text-danger">*</span></label>
       <input name="name" class="form-control" required>
     </div>
 
     <div class="mb-3">
-      <label class="form-label">CX Services (Placeholder)</label>
+      <label class="form-label">CX Services</label>
       <textarea name="cx_services" class="form-control"></textarea>
     </div>
 
@@ -17,7 +18,13 @@
       <textarea name="notes" class="form-control"></textarea>
     </div>
 
-    <button class="btn btn-success">Save</button>
+    <div class="mb-3">
+      <label class="form-label">Upload Logo (.png)</label>
+      <input type="file" name="logo" class="form-control" accept="image/png">
+    </div>
+
+    <button class="btn btn-success">💾 Save</button>
+    <a href="{{ url_for('settings', tab='customers') }}" class="btn btn-secondary ms-2">Cancel</a>
+
   </form>
-</div>
 {% endblock %}

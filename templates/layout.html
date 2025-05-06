@@ -16,8 +16,13 @@
     <a href="/" class="nav-link fw-bold" style="font-size: 1.15rem;">
       🏠 <span>Customers</span>
     </a>
-
-        <!-- 🔻 Divider -->
+     
+    <!-- 🔥 Heatmap Link -->
+    <a class="nav-link" href="{{ url_for('heatmap') }}">
+      🔥 Heatmap
+    </a>
+        
+    <!-- 🔻 Divider -->
     <hr class="my-4">
 
     <a class="nav-link badge-right" href="{{ url_for('action_item_list') }}">
@@ -53,7 +58,20 @@
     <a class="nav-link" href="{{ url_for('all_files_by_customer') }}">
       📁 View All Files
     </a>
+
+            <!-- 🔻 Divider -->
+            <hr class="my-4">
+
+    <!-- 🔧 Settings Link -->
+    <a class="nav-link" href="{{ url_for('settings') }}">
+      ⚙️ Settings
+    </a>
+
+
   </div>
+
+
+
 
   <!-- ✅ MAIN CONTENT -->
   <div class="content">
