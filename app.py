@@ -2287,6 +2287,8 @@ def save_heatmap():
                 print(f"⚠️ Column mismatch for customer ID {customer_id_str}")
                 continue
 
+            change_summary = []
+
             for i, value in enumerate(cell_values):
                 if '::' not in value:
                     color, text = '', ''
@@ -2294,26 +2296,34 @@ def save_heatmap():
                     color, text = value.split('::', 1)
 
                 column = COLUMNS[i]
-                print(f"   - {column}: color={color.strip()}, text={text.strip()}")
+                color = color.strip()
+                text = text.strip()
 
                 existing_cell = HeatmapCell.query.filter_by(customer_id=customer.id, column_name=column).first()
 
                 if color or text:
                     if existing_cell:
-                        existing_cell.color = color.strip()
-                        existing_cell.text = text.strip()
+                        if existing_cell.color != color or existing_cell.text != text:
+                            change_summary.append(f"{column}: '{existing_cell.text}' → '{text}' [{existing_cell.color} → {color}]")
+                        existing_cell.color = color
+                        existing_cell.text = text
                         db.session.add(existing_cell)
                     else:
+                        change_summary.append(f"{column}: (new) '{text}' [{color}]")
                         new_cell = HeatmapCell(
                             customer_id=customer.id,
                             column_name=column,
-                            color=color.strip(),
-                            text=text.strip()
+                            color=color,
+                            text=text
                         )
                         db.session.add(new_cell)
                 else:
                     if existing_cell:
+                        change_summary.append(f"{column}: cleared '{existing_cell.text}' [{existing_cell.color}]")
                         db.session.delete(existing_cell)
+
+            if change_summary:
+                log_change("Edited heatmap", f"{customer.name} → " + "; ".join(change_summary))
 
         except Exception as e:
             print(f"❌ Exception occurred while processing line: {line}")
@@ -2326,11 +2336,16 @@ def save_heatmap():
 
 @app.route('/reset_heatmap')
 def reset_heatmap():
+    affected_customer_ids = db.session.query(HeatmapCell.customer_id).distinct().all()
+
+    for (cust_id,) in affected_customer_ids:
+        customer = Customer.query.get(cust_id)
+        if customer:
+            log_change("Reset heatmap", f"{customer.name} → all cells cleared")
+
     HeatmapCell.query.delete()
     db.session.commit()
     return redirect(url_for('heatmap', msg='🧹 Heatmap reset — all cells cleared!'))
-
-
 
 #------------------ SETTINGS ROUTES ---------------------
 

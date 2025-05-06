@@ -4,3 +4,45 @@
  * Debug mode: on
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py:2280: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  customer = Customer.query.get(int(customer_id_str.strip()))
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📥 Saving Heatmap Data:
+5||::|::|::|::|::|::|::|::|::|::|::
+8||::|::|red::|::|::|::|::|::|::|::|::
+1||::|::|::|::|::|::|::|::|::|::|::
+3||::|::|::|red::|::|::|::|::|::|::|::
+7||::|::|::|::|::|::|::|::|::|::|::
+4||::|::|::|red::|::|::|::|::|::|::|::
+2||::|::|::|::|::|::|::|::|::|::|::
+6||::|::|::|::|::|::|::|::|::|::|::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||::|::|::|::|::|::|::|::|::|::|::
+8||::|::|yellow::test|::|::|::|::|::|::|::|::
+1||::|::|::|::|::|::|::|::|::|::|::
+3||::|::|::|red::|::|::|::|::|::|::|::
+7||::|::|::|::|::|::|::|::|::|::|::
+4||::|::|::|red::|::|::|::|::|::|::|::
+2||::|::|::|::|::|::|::|::|::|::|::
+6||::|::|::|::|::|::|::|::|::|::|::
+✅ DB commit completed
+📥 Saving Heatmap Data:
+5||::|::|::|::|::|::|::|::|::|::|::
+8||::|::|yellow::test|::|::|::|::|::|::|::|::
+1||::|::|::|::|::|::|::|::|::|::|::
+3||::|::|::|red::|::|::|::|::|::|::|::
+7||::|::|::|::|::|::|::|::|::|::|::
+4||::|::|::|red::|::|::|::|::|::|::|::
+2||::|::|::|::|::|::|::|::|::|::|::
+6||::|::|::|::|::|::|::|::|::|::|::
+✅ DB commit completed
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py:2342: LegacyAPIWarning: The Query.get() method is considered legacy as of the 1.x series of SQLAlchemy and becomes a legacy construct in 2.0. The method is now available as Session.get() (deprecated since: 2.0) (Background on SQLAlchemy 2.0 at: https://sqlalche.me/e/b8d9)
+  customer = Customer.query.get(cust_id)
