@@ -1,69 +1,22 @@
-import csv
-import io
 import os
-import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import datetime
 from threading import Thread
 
 from flask import (
     Flask,
-    abort,
-    redirect,
-    render_template,
     request,
-    send_file,
-    send_from_directory,
-    url_for,
 )
-from icalendar import Calendar, Event
-from markupsafe import Markup
-from werkzeug.utils import secure_filename
 
 from config import (
     BACKUP_LOCAL_DIR,
     BACKUP_SHARED_DIR,
-    CHANGE_LOG_FILE,
-    COLUMNS,
     DATABASE_PATH,
-    DEVICE_NAME,
-    DISCOVERY_ROOT,
     LOGO_UPLOAD_FOLDER,
-    ONEDRIVE_PATH,
-    SKIP_FOLDERS,
-    SQLALCHEMY_DATABASE_URI,
-    SQLALCHEMY_TRACK_MODIFICATIONS,
     UPLOAD_FOLDER,
 )
 from extensions import db
-from models import (
-    ActionItem,
-    ActionItemUpdate,
-    Contact,
-    Customer,
-    CustomerOpportunity,
-    CustomerProject,
-    CustomerTechnology,
-    Division,
-    DivisionDocument,
-    DivisionOpportunity,
-    DivisionProject,
-    DivisionTechnology,
-    FileIndex,
-    HeatmapCell,
-    Meeting,
-    Partner,
-    RecurringMeeting,
-    customer_contacts,
-    division_contact,
-    division_contacts,
-    meeting_participants,
-    partner_customer,
-)
 from utils import (
     log_change,
-    scan_and_index_files,
-    sync_all_files_logic,
-    sync_customer_files_logic,
 )
 
 app = Flask(__name__)

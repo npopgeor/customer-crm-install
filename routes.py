@@ -1,10 +1,8 @@
 # Imports from your own app
 import csv
 import io
-import logging
 import os
-import re
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
 
 from flask import (
     abort,
@@ -12,37 +10,26 @@ from flask import (
     render_template,
     request,
     send_file,
-    send_from_directory,
     url_for,
 )
 from icalendar import Calendar, Event
-from markupsafe import Markup
 from sqlalchemy.orm import joinedload
 from werkzeug.utils import secure_filename
 
 # If you have this defined globally in app.py, replicate or import
 # These must be imported from app.py for now
-from app import COLUMNS  # or define COLUMNS = ['Tech1', 'Tech2', ...] here temporarily
 from app import (
-    BACKUP_LOCAL_DIR,
-    BACKUP_SHARED_DIR,
-    DEVICE_NAME,
-    DISCOVERY_ROOT,
-    UPLOAD_FOLDER,
     app,
     db,
 )
 from config import (
     BACKUP_LOCAL_DIR,
     BACKUP_SHARED_DIR,
-    CHANGE_LOG_FILE,
     COLUMNS,
     DATABASE_PATH,
     DEVICE_NAME,
     DISCOVERY_ROOT,
-    ONEDRIVE_PATH,
     SKIP_FOLDERS,
-    UPLOAD_FOLDER,
 )
 from extensions import db
 
@@ -72,12 +59,8 @@ from utils import (
     log_change,
     scan_and_index_files,
     secure_folder_name,
-    sync_all_files_logic,
     sync_customer_files_logic,
 )
-
-# from models import Customer, HeatmapCell
-# from utils import log_change
 
 
 # --------------------- ROUTES ---------------------

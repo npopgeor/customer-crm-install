@@ -1,9 +1,9 @@
 import logging
 import os
-from datetime import datetime
+
+
 
 from config import (
-    BACKUP_LOCAL_DIR,
     CHANGE_LOG_FILE,
     DEVICE_NAME,
     DISCOVERY_ROOT,
@@ -15,6 +15,7 @@ from models import Customer, Division, DivisionDocument, FileIndex
 
 
 # --------------------- FUNCTIONS ---------------------
+
 def secure_folder_name(name):
     return (
         "".join(c for c in name if c.isalnum() or c in (" ", "_", "-"))
