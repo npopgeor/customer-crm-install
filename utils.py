@@ -1,4 +1,5 @@
 import logging
+from logging.handlers import RotatingFileHandler
 import os
 from threading import Thread
 from datetime import datetime
@@ -233,6 +234,43 @@ def backup_db_internal():
         logger.error(f"❌ Backup failed: {e}")
 
 
+# === Check last backup ===
+
+
+def get_last_backup_times():
+    last_shared = None
+    last_local = None
+
+    try:
+        shared_files = [
+            f for f in os.listdir(BACKUP_SHARED_DIR) if f.startswith("account_team_")
+        ]
+        local_files = [
+            f for f in os.listdir(BACKUP_LOCAL_DIR) if f.startswith("account_team_")
+        ]
+        if shared_files:
+            shared_files.sort(reverse=True)
+            last_shared = shared_files[0]
+
+        if local_files:
+            local_files.sort(reverse=True)
+            last_local = local_files[0]
+        def extract_dt(filename):
+            try:
+                # Grab the part between 'account_team_' and '.db'
+                ts = filename.replace("account_team_", "").replace(".db", "")
+                return datetime.strptime(ts, "%Y%m%d_%H%M%S")
+            except:
+                return None
+
+        return {
+            "shared": extract_dt(last_shared) if last_shared else None,
+            "local": extract_dt(last_local) if last_local else None
+        }
+
+    except Exception as e:
+        return {"shared": None, "local": None}
+
 
 
 # === Logging setup ===
@@ -242,7 +280,8 @@ CHANGE_LOG_FILE = os.path.join(ONEDRIVE_PATH, "APP", "change_log.txt")
 logger = logging.getLogger("crm_logger")
 logger.setLevel(logging.INFO)
 
-file_handler = logging.FileHandler(CHANGE_LOG_FILE)
+# 📦 Rotating file handler: max ~1MB per file, keep last 5
+file_handler = RotatingFileHandler(CHANGE_LOG_FILE, maxBytes=1_000_000, backupCount=5)
 file_handler.setFormatter(logging.Formatter("%(asctime)s — %(message)s"))
 logger.addHandler(file_handler)
 

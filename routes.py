@@ -31,6 +31,7 @@ from config import (
     DEVICE_NAME,
     DISCOVERY_ROOT,
     SKIP_FOLDERS,
+
 )
 from extensions import db
 
@@ -61,7 +62,9 @@ from utils import (
     scan_and_index_files,
     secure_folder_name,
     sync_customer_files_logic,
-    logger
+    logger,
+    CHANGE_LOG_FILE,
+    get_last_backup_times,
 )
 
 
@@ -2023,7 +2026,7 @@ def dashboard():
         total_recurring=RecurringMeeting.query.count(),
         open_actions=ActionItem.query.filter_by(completed=False).count(),
         meetings_today=meetings_today,
-        open_action_customers=open_action_customers,  # ✅ pass list instead of bool
+        open_action_customers=open_action_customers, # ✅ pass list instead of bool
     )
 
 
@@ -2142,12 +2145,32 @@ def reset_heatmap():
 
 # ------------------ SETTINGS ROUTES ---------------------
 
-
 @app.route("/settings")
 def settings():
-    tab = request.args.get("tab", "customers")  # default to 'customers'
+    from models import Customer, Partner
+
     customers = Customer.query.order_by(Customer.name).all()
     partners = Partner.query.order_by(Partner.name).all()
+    tab = request.args.get("tab", "log")
+
+    # 🔍 Read & filter the log file
+    log_content = ""
+    try:
+        with open(CHANGE_LOG_FILE, "r") as f:
+            lines = f.readlines()
+            filtered_lines = [line for line in lines if "Nik" in line or "Gary" in line]
+            log_content = "".join(reversed(filtered_lines[-200:]))  # Show last 200 matching lines
+    except Exception as e:
+        log_content = f"❌ Could not read log file: {e}"
+    
+    backup_times = get_last_backup_times()
+    
     return render_template(
-        "settings.html", tab=tab, customers=customers, partners=partners
+        "settings.html",
+        customers=customers,
+        partners=partners,
+        tab=tab,
+        log_content=log_content,
+        backup_times=backup_times,
+        now=datetime.now()
     )
