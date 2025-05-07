@@ -60,6 +60,7 @@ from utils import (
     scan_and_index_files,
     secure_folder_name,
     sync_customer_files_logic,
+    logger
 )
 
 
@@ -549,13 +550,13 @@ def import_contacts_csv():
         db.session.commit()
 
         # 💬 Print a report in terminal
-        print(f"✅ Imported {imported_count} contacts successfully.")
+        logger.info(f"✅ Imported {imported_count} contacts successfully.")
         if skipped_rows:
-            print("⚠️ Skipped rows:")
+            logger.warning("⚠️ Skipped rows:")
             for row_num, missing in skipped_rows:
-                print(f"  - Row {row_num}: Missing fields {', '.join(missing)}")
+                logger.error(f"  - Row {row_num}: Missing fields {', '.join(missing)}")
         else:
-            print("🎉 No skipped rows.")
+            logger.info("🎉 No skipped rows.")
 
         return redirect(url_for("contact_list"))
 
@@ -734,9 +735,9 @@ def add_customer():
                 app.config["LOGO_UPLOAD_FOLDER"], f"{safe_name}.png"
             )
             logo_file.save(logo_path)
-            print(f"✅ Saved logo to: {logo_path}")
+            logger.info(f"✅ Saved logo to: {logo_path}")
         else:
-            print("⚠️ No logo uploaded or wrong file type.")
+            logger.error("⚠️ No logo uploaded or wrong file type.")
 
         # ✅ Optional division file handling...
         division_name = request.form.get("division_name")
@@ -949,9 +950,9 @@ def delete_customer_file(file_id):
     try:
         if os.path.exists(full_path):
             os.remove(full_path)
-            print(f"🗑️ Deleted file: {full_path}")
+            logger.info(f"🗑️ Deleted file: {full_path}")
     except Exception as e:
-        print(f"⚠️ Error deleting file: {e}")
+        logger.error(f"⚠️ Error deleting file: {e}")
 
     db.session.delete(doc)
     db.session.commit()
@@ -1878,7 +1879,7 @@ def backup_db():
         return redirect(url_for("dashboard", msg="✅ Backup saved to OneDrive + Mac!"))
 
     except Exception as e:
-        print(f"❌ Manual backup failed: {e}")
+        logger.error(f"❌ Manual backup failed: {e}")
         return redirect(
             url_for("dashboard", msg="❌ Backup failed. Check server logs.")
         )
@@ -2036,8 +2037,8 @@ def heatmap():
 @app.route("/save_heatmap", methods=["POST"])
 def save_heatmap():
     raw_data = request.form.get("heatmap_data", "")
-    print("📥 Saving Heatmap Data:")
-    print(raw_data)
+    logger.info("📥 Saving Heatmap Data:")
+   # logger.info(raw_data)
 
     for line in raw_data.strip().split("\n"):
         if not line.strip():
@@ -2047,12 +2048,12 @@ def save_heatmap():
             customer_id_str, cells_raw = line.split("||")
             customer = Customer.query.get(int(customer_id_str.strip()))
             if not customer:
-                print(f"❌ Customer not found with ID: {customer_id_str}")
+                logger.error(f"❌ Customer not found with ID: {customer_id_str}")
                 continue
 
             cell_values = cells_raw.split("|")
             if len(cell_values) != len(COLUMNS):
-                print(f"⚠️ Column mismatch for customer ID {customer_id_str}")
+                logger.error(f"⚠️ Column mismatch for customer ID {customer_id_str}")
                 continue
 
             change_summary = []
@@ -2102,12 +2103,12 @@ def save_heatmap():
                 )
 
         except Exception as e:
-            print(f"❌ Exception occurred while processing line: {line}")
-            print(f"   Error: {e}")
+            logger.error(f"❌ Exception occurred while processing line: {line}")
+            logger.error(f"   Error: {e}")
             continue
 
     db.session.commit()
-    print("✅ DB commit completed")
+    logger.info("✅ DB commit completed")
     return redirect(url_for("heatmap", msg="✅ Heatmap saved!"))
 
 

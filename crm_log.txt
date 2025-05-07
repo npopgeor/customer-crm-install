@@ -1,8 +1,34 @@
 📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
 🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
-📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
-🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
  * Serving Flask app 'app'
  * Debug mode: on
-/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
-  warnings.warn('resource_tracker: There appear to be %d '
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+[33mPress CTRL+C to quit[0m
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 536-586-427
+ * Detected change in '/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py', reloading
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 536-586-427
+ * Detected change in '/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py', reloading
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+ * Restarting with stat
+ * Debugger is active!
+ * Debugger PIN: 536-586-427
+ * Detected change in '/Users/npopgeor/Desktop/Customers_app/For New Installation/config.py', reloading
+📁 ONEDRIVE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25
+🗃️ DATABASE path: /Users/npopgeor/OneDrive - Cisco/Gary Bedol (gbedol)'s files - SP Accounts FY25/APP/account_team.db
+ * Restarting with stat
+Traceback (most recent call last):
+  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/app.py", line 10, in <module>
+    from config import (
+  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/config.py", line 5, in <module>
+    from utils import logger
+  File "/Users/npopgeor/Desktop/Customers_app/For New Installation/utils.py", line 6, in <module>
+    from config import (
+ImportError: cannot import name 'CHANGE_LOG_FILE' from partially initialized module 'config' (most likely due to a circular import) (/Users/npopgeor/Desktop/Customers_app/For New Installation/config.py)

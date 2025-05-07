@@ -173,7 +173,7 @@ def sync_customer_files_logic(customer_id):
                 if not any(os.scandir(folder_path)):
                     os.rmdir(folder_path)
             except Exception as e:
-                print(f"⚠️ Could not clean {folder_path}: {e}")
+                logger.error(f"⚠️ Could not clean {folder_path}: {e}")
 
 
 def scan_and_index_files():
@@ -192,12 +192,13 @@ def scan_and_index_files():
     db.session.commit()
 
 
-logging.basicConfig(
-    filename=CHANGE_LOG_FILE,
-    level=logging.INFO,
-    format="%(asctime)s — %(message)s",
-)
+logger = logging.getLogger("crm_logger")
+logger.setLevel(logging.INFO)
+
+file_handler = logging.FileHandler(CHANGE_LOG_FILE)
+file_handler.setFormatter(logging.Formatter("%(asctime)s — %(message)s"))
+logger.addHandler(file_handler)
 
 
 def log_change(action: str, target: str):
-    logging.info(f"[{DEVICE_NAME}] {action} → {target}")
+    logger.info(f"[{DEVICE_NAME}] {action} → {target}")

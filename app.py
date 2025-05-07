@@ -16,7 +16,7 @@ from config import (
 )
 from extensions import db
 from utils import (
-    log_change,
+    log_change,logger
 )
 
 app = Flask(__name__)
@@ -71,11 +71,11 @@ def backup_db_internal():
         with open(local_backup_path, "wb") as f2:
             f2.write(data)
 
-        print(f"✅ Backup successful: {filename}")
+        logger.info(f"✅ Backup successful: {filename}")
         log_change("Backup created", f"{filename}")
 
     except Exception as e:
-        print(f"❌ Backup failed: {e}")
+        logger.error(f"❌ Backup failed: {e}")
 
 
 @app.template_filter("datetimeformat")
