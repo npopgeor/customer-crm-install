@@ -1,5 +1,6 @@
 # Imports from your own app
-from app import app, db, COLUMNS, DEVICE_NAME, DISCOVERY_ROOT, BACKUP_SHARED_DIR, BACKUP_LOCAL_DIR, UPLOAD_FOLDER
+from extensions import db
+from app import app, COLUMNS, DEVICE_NAME, DISCOVERY_ROOT, BACKUP_SHARED_DIR, BACKUP_LOCAL_DIR, UPLOAD_FOLDER
 
 # Model classes
 from models import (
@@ -9,8 +10,25 @@ from models import (
     DivisionOpportunity, DivisionTechnology, DivisionProject,
     HeatmapCell
 )
+
 # Many-to-many association tables (if needed explicitly for deletes/clears)
 from models import division_contact
+
+from config import (
+    DEVICE_NAME,
+    ONEDRIVE_PATH,
+    UPLOAD_FOLDER,
+    DISCOVERY_ROOT,
+    BACKUP_SHARED_DIR,
+    BACKUP_LOCAL_DIR,
+    SKIP_FOLDERS,
+    COLUMNS,
+    CHANGE_LOG_FILE,
+    DATABASE_PATH
+)
+
+
+from utils import scan_and_index_files, sync_customer_files_logic, sync_all_files_logic, log_change,secure_folder_name, get_customer_attachments
 
 from flask import request, render_template, redirect, url_for, send_from_directory, send_file, abort
 from datetime import datetime, timedelta, date, timezone
@@ -19,6 +37,8 @@ import re
 import io
 import csv
 import logging
+from sqlalchemy.orm import joinedload
+
 
 from markupsafe import Markup
 from icalendar import Calendar, Event

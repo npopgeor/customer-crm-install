@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from app import db
+from extensions import db
 
 partner_customer = db.Table('partner_customer',
     db.Column('partner_id', db.Integer, db.ForeignKey('partner.id'), primary_key=True),
