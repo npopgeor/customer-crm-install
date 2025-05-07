@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>🔗 Links</h2>
+
+  <!-- Add Link Form -->
+<form method="POST" action="{{ url_for('add_link') }}" class="mb-4">
+    <div class="row g-2">
+      <div class="col-md-4"><input name="link_text" class="form-control" placeholder="Link"></div>
+      <div class="col-md-4"><input name="url" class="form-control" placeholder="URL" required></div>
+      <div class="col-md-4"><input name="others" class="form-control" placeholder="Other info"></div>
+    </div>
+    <button class="btn btn-primary mt-2">➕ Add</button>
+  </form>
+  
+  <!-- Table -->
+  <table class="table table-striped w-100">
+    <thead>
+      <tr>
+        <th>Link</th>
+        <th>URL</th>
+        <th>Others</th>
+        <th class="text-end">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for link in links %}
+      <tr>
+        <td>{{ link.link_text }}</td>
+        <td><a href="{{ link.url }}" target="_blank">{{ link.url }}</a></td>
+        <td>{{ link.others }}</td>
+        <td class="text-end">
+          <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ link.id }}">✏️</button>
+          <form method="POST" action="{{ url_for('delete_link', link_id=link.id) }}" style="display:inline;">
+            <button class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this?')">🗑️</button>
+          </form>
+  
+          <!-- Edit Modal -->
+          <div class="modal fade" id="editModal{{ link.id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <form method="POST" action="{{ url_for('edit_link', link_id=link.id) }}">
+                <div class="modal-content">
+                  <div class="modal-header"><h5>Edit Link</h5></div>
+                  <div class="modal-body">
+                    <input name="link_text" class="form-control mb-2" value="{{ link.link_text }}">
+                    <input name="url" class="form-control mb-2" value="{{ link.url }}" required>
+                    <input name="others" class="form-control mb-2" value="{{ link.others }}">
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn btn-primary">💾 Save</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  
+</div>
+{% endblock %}

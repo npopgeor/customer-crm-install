@@ -55,6 +55,7 @@ from models import (
     Partner,
     RecurringMeeting,
     division_contact,
+    Link,
 )
 from utils import (
     get_customer_attachments,
@@ -140,7 +141,13 @@ def search():
         | (Contact.notes.ilike(f"%{query}%"))
         | (Contact.customer.has(Customer.name.ilike(f"%{query}%")))
     ).all()
-
+    
+    links = Link.query.filter(
+        (Link.link_text.ilike(f"%{query}%"))
+        | (Link.url.ilike(f"%{query}%"))
+        | (Link.others.ilike(f"%{query}%"))
+    ).all()
+        
     partners = Partner.query.filter(
         (Partner.name.ilike(f"%{query}%")) | (Partner.notes.ilike(f"%{query}%"))
     ).all()
@@ -169,6 +176,7 @@ def search():
         contacts=contacts,
         partners=partners,
         file_name_hits=file_name_hits,
+        links=links  # ✅ Add this line
     )
 
 
@@ -2174,3 +2182,38 @@ def settings():
         backup_times=backup_times,
         now=datetime.now()
     )
+
+# ------------------  LINKS ROUTES ---------------------
+
+@app.route('/links')
+def links():
+    all_links = Link.query.order_by(Link.timestamp.desc()).all()
+    return render_template('links.html', links=all_links)
+
+@app.route('/add-link', methods=['POST'])
+def add_link():
+    link_text = request.form.get('link_text')
+    url = request.form.get('url')
+    others = request.form.get('others')
+
+    if url:
+        new_link = Link(link_text=link_text, url=url, others=others)
+        db.session.add(new_link)
+        db.session.commit()
+    return redirect(url_for('links'))
+
+@app.route('/edit-link/<int:link_id>', methods=['POST'])
+def edit_link(link_id):
+    link = Link.query.get_or_404(link_id)
+    link.link_text = request.form.get('link_text')
+    link.url = request.form.get('url')
+    link.others = request.form.get('others')
+    db.session.commit()
+    return redirect(url_for('links'))
+
+@app.route('/delete-link/<int:link_id>', methods=['POST'])
+def delete_link(link_id):
+    link = Link.query.get_or_404(link_id)
+    db.session.delete(link)
+    db.session.commit()
+    return redirect(url_for('links'))

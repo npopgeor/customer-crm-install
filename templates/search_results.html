@@ -3,6 +3,9 @@
 <h2 class="mb-4">🔍 Results for "{{ query }}"</h2>
 
 
+<!-- Customers and Partners are commented, not really needed at this point. May decide to remove them from the routes as well-->
+
+
 {#
 <!-- Customers -->
 <h4>🏢 Customers</h4>
@@ -21,6 +24,7 @@
 {% endif %}
 
 
+<!-- Customers and Partners are commented, not really needed at this point. May decide to remove them from the routes as well-->
 
 
 <!-- Partners -->
@@ -89,6 +93,23 @@
 {% else %}
   <p class="text-muted">No matching files or folders found.</p>
 {% endif %}
+
+<!-- Links -->
+<h4>🔗 Links</h4>
+{% if links %}
+  <ul class="list-group mb-4">
+    {% for link in links %}
+    <li class="list-group-item">
+      <div><strong>{{ link.link_text or '—' }}</strong></div>
+      <div><a href="{{ link.url }}" target="_blank">{{ link.url }}</a></div>
+      <div class="text-muted small">{{ link.others or '' }}</div>
+    </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p class="text-muted">No matching links found.</p>
+{% endif %}
+
 
 <script>
 

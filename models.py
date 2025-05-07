@@ -327,3 +327,10 @@ class HeatmapCell(db.Model):
     __table_args__ = (
         db.UniqueConstraint("customer_id", "column_name", name="_customer_column_uc"),
     )
+    
+class Link(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    link_text = db.Column(db.Text, nullable=True)  # formerly 'notes'
+    url = db.Column(db.String(512), nullable=False)
+    others = db.Column(db.Text, nullable=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
