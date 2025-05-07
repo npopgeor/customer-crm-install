@@ -9,15 +9,13 @@ from flask import (
 )
 
 from config import (
-    BACKUP_LOCAL_DIR,
-    BACKUP_SHARED_DIR,
     DATABASE_PATH,
     LOGO_UPLOAD_FOLDER,
     UPLOAD_FOLDER,
 )
 from extensions import db
 from utils import (
-    log_change,logger, daily_backup_if_needed
+    daily_backup_if_needed
 )
 
 

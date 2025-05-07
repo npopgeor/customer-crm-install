@@ -5,6 +5,7 @@ instance/
 .env
 *.tar
 *.log
+crm_log.txt
 venv/
 uploads/
 .DS_Store
