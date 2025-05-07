@@ -1,4 +1,5 @@
 import os
+
 from dotenv import load_dotenv
 
 # === Load environment variables from .env ===
@@ -20,16 +21,26 @@ DISCOVERY_ROOT = ONEDRIVE_PATH
 BACKUP_SHARED_DIR = os.path.join(ONEDRIVE_PATH, "APP backup")
 BACKUP_LOCAL_DIR = os.path.join(os.getcwd(), "instance", "backup")
 UPLOAD_FOLDER = os.path.join(os.getcwd(), "uploads")
-LOGO_UPLOAD_FOLDER = os.path.join(os.getcwd(), "static", "logos")  # avoid app reference here
+LOGO_UPLOAD_FOLDER = os.path.join(
+    os.getcwd(), "static", "logos"
+)  # avoid app reference here
 
 SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_PATH}"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 # === Heatmap columns ===
 COLUMNS = [
-    "Enterprise Switching", "Internet Infra", "DC Networking",
-    "Enterprise Routing", "Security", "Wireless", "Compute",
-    "Assurance", "Collab", "IOT", "Meraki"
+    "Enterprise Switching",
+    "Internet Infra",
+    "DC Networking",
+    "Enterprise Routing",
+    "Security",
+    "Wireless",
+    "Compute",
+    "Assurance",
+    "Collab",
+    "IOT",
+    "Meraki",
 ]
 
 # === Logging setup ===

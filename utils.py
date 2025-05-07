@@ -1,14 +1,26 @@
-import os
 import logging
-
+import os
 from datetime import datetime
-from models import Customer, Division, DivisionDocument, FileIndex
-from config import UPLOAD_FOLDER, DISCOVERY_ROOT, SKIP_FOLDERS, BACKUP_LOCAL_DIR, DEVICE_NAME, CHANGE_LOG_FILE
+
+from config import (
+    BACKUP_LOCAL_DIR,
+    CHANGE_LOG_FILE,
+    DEVICE_NAME,
+    DISCOVERY_ROOT,
+    SKIP_FOLDERS,
+    UPLOAD_FOLDER,
+)
 from extensions import db
+from models import Customer, Division, DivisionDocument, FileIndex
+
 
 # --------------------- FUNCTIONS ---------------------
 def secure_folder_name(name):
-    return "".join(c for c in name if c.isalnum() or c in (' ', '_', '-')).rstrip().replace(' ', '_')
+    return (
+        "".join(c for c in name if c.isalnum() or c in (" ", "_", "-"))
+        .rstrip()
+        .replace(" ", "_")
+    )
 
 
 def get_customer_attachments(customer_id):
@@ -21,11 +33,17 @@ def get_customer_attachments(customer_id):
     root_docs = DivisionDocument.query.filter_by(division_id=root.id).all()
 
     # Division documents = documents under child divisions
-    child_divisions = Division.query.filter_by(customer_id=customer_id).filter(Division.parent_id == root.id).all()
+    child_divisions = (
+        Division.query.filter_by(customer_id=customer_id)
+        .filter(Division.parent_id == root.id)
+        .all()
+    )
     child_division_ids = [d.id for d in child_divisions]
 
     if child_division_ids:
-        division_docs = DivisionDocument.query.filter(DivisionDocument.division_id.in_(child_division_ids)).all()
+        division_docs = DivisionDocument.query.filter(
+            DivisionDocument.division_id.in_(child_division_ids)
+        ).all()
     else:
         division_docs = []
 
@@ -36,12 +54,12 @@ def sync_all_files_logic():
     customers = Customer.query.all()
 
     # ➕ General folder sync
-    general_folder = os.path.join(UPLOAD_FOLDER, 'General')
+    general_folder = os.path.join(UPLOAD_FOLDER, "General")
     os.makedirs(general_folder, exist_ok=True)
 
-    general_div = Division.query.filter_by(name='General', customer_id=None).first()
+    general_div = Division.query.filter_by(name="General", customer_id=None).first()
     if not general_div:
-        general_div = Division(name='General', customer_id=None)
+        general_div = Division(name="General", customer_id=None)
         db.session.add(general_div)
         db.session.commit()
 
@@ -49,7 +67,7 @@ def sync_all_files_logic():
     for root, _, files in os.walk(general_folder):
         for file in files:
             rel_path = os.path.relpath(os.path.join(root, file), UPLOAD_FOLDER)
-            if not rel_path.endswith('.DS_Store'):
+            if not rel_path.endswith(".DS_Store"):
                 general_files.append(rel_path)
 
     db_general_docs = DivisionDocument.query.filter_by(division_id=general_div.id).all()
@@ -61,7 +79,9 @@ def sync_all_files_logic():
 
     for rel_path in general_files:
         if rel_path not in db_general_filenames:
-            db.session.add(DivisionDocument(division_id=general_div.id, filename=rel_path))
+            db.session.add(
+                DivisionDocument(division_id=general_div.id, filename=rel_path)
+            )
 
     # 🔁 Customer folders
     for customer in customers:
@@ -69,7 +89,9 @@ def sync_all_files_logic():
         customer_folder = os.path.join(UPLOAD_FOLDER, folder_name)
         os.makedirs(customer_folder, exist_ok=True)
 
-        root_div = Division.query.filter_by(customer_id=customer.id, parent_id=None).first()
+        root_div = Division.query.filter_by(
+            customer_id=customer.id, parent_id=None
+        ).first()
         if not root_div:
             root_div = Division(name=customer.name, customer_id=customer.id)
             db.session.add(root_div)
@@ -79,7 +101,7 @@ def sync_all_files_logic():
         for root, _, files in os.walk(customer_folder):
             for file in files:
                 rel_path = os.path.relpath(os.path.join(root, file), UPLOAD_FOLDER)
-                if not rel_path.endswith('.DS_Store'):
+                if not rel_path.endswith(".DS_Store"):
                     disk_files.append(rel_path)
 
         db_docs = DivisionDocument.query.filter_by(division_id=root_div.id).all()
@@ -91,7 +113,9 @@ def sync_all_files_logic():
 
         for rel_path in disk_files:
             if rel_path not in db_filenames:
-                db.session.add(DivisionDocument(division_id=root_div.id, filename=rel_path))
+                db.session.add(
+                    DivisionDocument(division_id=root_div.id, filename=rel_path)
+                )
 
     db.session.commit()
 
@@ -102,7 +126,9 @@ def sync_customer_files_logic(customer_id):
     customer_folder = os.path.join(UPLOAD_FOLDER, folder_name)
     os.makedirs(customer_folder, exist_ok=True)
 
-    root_division = Division.query.filter_by(customer_id=customer.id, parent_id=None).first()
+    root_division = Division.query.filter_by(
+        customer_id=customer.id, parent_id=None
+    ).first()
     if not root_division:
         root_division = Division(name=customer.name, customer_id=customer.id)
         db.session.add(root_division)
@@ -114,7 +140,7 @@ def sync_customer_files_logic(customer_id):
         for file in files:
             full_path = os.path.join(root, file)
             rel_path = os.path.relpath(full_path, UPLOAD_FOLDER)
-            if not rel_path.endswith('.DS_Store'):
+            if not rel_path.endswith(".DS_Store"):
                 disk_files.append(rel_path)
 
     # Files in DB
@@ -129,7 +155,9 @@ def sync_customer_files_logic(customer_id):
     # Add missing ones to DB
     for rel_path in disk_files:
         if rel_path not in db_filenames:
-            db.session.add(DivisionDocument(division_id=root_division.id, filename=rel_path))
+            db.session.add(
+                DivisionDocument(division_id=root_division.id, filename=rel_path)
+            )
 
     db.session.commit()
 
@@ -138,7 +166,7 @@ def sync_customer_files_logic(customer_id):
         for d in dirs:
             folder_path = os.path.join(root, d)
             try:
-                ds_store = os.path.join(folder_path, '.DS_Store')
+                ds_store = os.path.join(folder_path, ".DS_Store")
                 if os.path.isfile(ds_store):
                     os.remove(ds_store)
                 if not any(os.scandir(folder_path)):
@@ -153,15 +181,13 @@ def scan_and_index_files():
         if any(skip in root for skip in SKIP_FOLDERS):
             continue
         for file in files:
-            if file.startswith('.'):
+            if file.startswith("."):
                 continue
             rel_path = os.path.relpath(os.path.join(root, file), DISCOVERY_ROOT)
             parent = os.path.basename(os.path.dirname(os.path.join(root, file)))
-            db.session.add(FileIndex(
-                relative_path=rel_path,
-                filename=file,
-                parent_folder=parent
-            ))
+            db.session.add(
+                FileIndex(relative_path=rel_path, filename=file, parent_folder=parent)
+            )
     db.session.commit()
 
 
@@ -171,6 +197,6 @@ logging.basicConfig(
     format="%(asctime)s — %(message)s",
 )
 
+
 def log_change(action: str, target: str):
     logging.info(f"[{DEVICE_NAME}] {action} → {target}")
-
