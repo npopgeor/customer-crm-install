@@ -1,8 +1,6 @@
 import os
 
-
 from dotenv import load_dotenv
-from utils import logger
 
 # === Load environment variables from .env ===
 load_dotenv()
@@ -14,8 +12,8 @@ DATABASE_PATH = os.environ.get("DATABASE_PATH")
 
 if not ONEDRIVE_PATH or not DATABASE_PATH:
     raise RuntimeError("❌ Missing ONEDRIVE_PATH or DATABASE_PATH in .env.")
-logger.info(f"📁 ONEDRIVE path: {ONEDRIVE_PATH}")
-logger.info(f"🗃️ DATABASE path: {DATABASE_PATH}")
+print(f"📁 ONEDRIVE path: {ONEDRIVE_PATH}")
+print(f"🗃️ DATABASE path: {DATABASE_PATH}")
 
 # === Derived paths and config constants ===
 SKIP_FOLDERS = {"APP", "APP backup"}
@@ -44,9 +42,6 @@ COLUMNS = [
     "IOT",
     "Meraki",
 ]
-
-# === Logging setup ===
-CHANGE_LOG_FILE = os.path.join(ONEDRIVE_PATH, "APP", "change_log.txt")
 
 os.makedirs(LOGO_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)

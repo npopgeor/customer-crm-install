@@ -1,14 +1,20 @@
 import logging
 import os
+from threading import Thread
+from datetime import datetime
 
 
 
 from config import (
-    CHANGE_LOG_FILE,
     DEVICE_NAME,
     DISCOVERY_ROOT,
     SKIP_FOLDERS,
     UPLOAD_FOLDER,
+    ONEDRIVE_PATH,
+    BACKUP_SHARED_DIR,
+    BACKUP_LOCAL_DIR,
+    DATABASE_PATH
+
 )
 from extensions import db
 from models import Customer, Division, DivisionDocument, FileIndex
@@ -190,6 +196,47 @@ def scan_and_index_files():
                 FileIndex(relative_path=rel_path, filename=file, parent_folder=parent)
             )
     db.session.commit()
+
+
+def daily_backup_if_needed():
+    today = datetime.now().strftime("%Y%m%d")
+    files = os.listdir(BACKUP_SHARED_DIR)
+    found = any(f.startswith(f"account_team_{today}") for f in files)
+
+    if not found:
+        Thread(target=backup_db_internal).start()
+
+
+def backup_db_internal():
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"account_team_{timestamp}.db"
+
+    shared_backup_path = os.path.join(BACKUP_SHARED_DIR, filename)
+    local_backup_path = os.path.join(BACKUP_LOCAL_DIR, filename)
+
+    try:
+        os.makedirs(BACKUP_SHARED_DIR, exist_ok=True)
+        os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
+
+        with open(DATABASE_PATH, "rb") as src:
+            data = src.read()
+
+        with open(shared_backup_path, "wb") as f1:
+            f1.write(data)
+        with open(local_backup_path, "wb") as f2:
+            f2.write(data)
+
+        logger.info(f"✅ Backup successful: {filename}")
+        log_change("Backup created", f"{filename}")
+
+    except Exception as e:
+        logger.error(f"❌ Backup failed: {e}")
+
+
+
+
+# === Logging setup ===
+CHANGE_LOG_FILE = os.path.join(ONEDRIVE_PATH, "APP", "change_log.txt")
 
 
 logger = logging.getLogger("crm_logger")

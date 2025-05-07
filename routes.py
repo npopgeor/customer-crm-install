@@ -14,6 +14,7 @@ from flask import (
 )
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
+from sqlalchemy import func
 from werkzeug.utils import secure_filename
 
 # If you have this defined globally in app.py, replicate or import
@@ -73,35 +74,48 @@ def home():
 
 
 def get_grouped_contacts():
+    # ✅ Cisco contacts sorted alphabetically (case-insensitive)
     cisco_contacts = (
-        Contact.query.filter_by(contact_type="Cisco").order_by(Contact.name).all()
+        Contact.query.filter_by(contact_type="Cisco")
+        .order_by(func.lower(Contact.name))
+        .all()
     )
 
+    # ✅ Customers sorted by name, with their contacts sorted too
     customer_groups = []
-    for customer in Customer.query.order_by(Customer.name).all():
-        filtered = [c for c in customer.contacts if c.contact_type == "Customer"]
+    for customer in Customer.query.order_by(func.lower(Customer.name)).all():
+        filtered = sorted(
+            [c for c in customer.contacts if c.contact_type == "Customer"],
+            key=lambda c: c.name.lower()
+        )
         if filtered:
             customer.contacts = filtered
             customer_groups.append(customer)
 
+    # ✅ Partners sorted by name, with their contacts sorted too
     partner_groups = []
-    for partner in Partner.query.order_by(Partner.name).all():
-        filtered = [c for c in partner.contacts if c.contact_type == "Partner"]
+    for partner in Partner.query.order_by(func.lower(Partner.name)).all():
+        filtered = sorted(
+            [c for c in partner.contacts if c.contact_type == "Partner"],
+            key=lambda c: c.name.lower()
+        )
         if filtered:
             partner.contacts = filtered
             partner_groups.append(partner)
 
+    # ✅ Unassigned contacts sorted
     unassigned_contacts = (
-        Contact.query.filter_by(contact_type="Unassigned").order_by(Contact.name).all()
+        Contact.query.filter_by(contact_type="Unassigned")
+        .order_by(func.lower(Contact.name))
+        .all()
     )
 
     return {
         "cisco_contacts": cisco_contacts,
         "customer_contacts": customer_groups,
         "partner_contacts": partner_groups,
-        "unassigned_contacts": unassigned_contacts,  # ← Add this
+        "unassigned_contacts": unassigned_contacts,
     }
-
 
 @app.route("/search")
 def search():

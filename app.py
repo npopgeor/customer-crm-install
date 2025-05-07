@@ -1,6 +1,8 @@
+
+# IMPORTS
+
 import os
 from datetime import datetime
-from threading import Thread
 
 from flask import (
     Flask,
@@ -16,10 +18,14 @@ from config import (
 )
 from extensions import db
 from utils import (
-    log_change,logger
+    log_change,logger, daily_backup_if_needed
 )
 
+
+
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "fallback_dev_secret")
+
 
 # === Initialize Flask App ===
 
@@ -32,7 +38,6 @@ db.init_app(app)
 
 from flask import g
 
-
 @app.before_request
 def maybe_run_daily_backup():
     if request.endpoint == "dashboard" and not getattr(g, "backup_checked", False):
@@ -42,40 +47,6 @@ def maybe_run_daily_backup():
 
 from routes import *
 
-
-def daily_backup_if_needed():
-    today = datetime.now().strftime("%Y%m%d")
-    files = os.listdir(BACKUP_SHARED_DIR)
-    found = any(f.startswith(f"account_team_{today}") for f in files)
-
-    if not found:
-        Thread(target=backup_db_internal).start()
-
-
-def backup_db_internal():
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"account_team_{timestamp}.db"
-
-    shared_backup_path = os.path.join(BACKUP_SHARED_DIR, filename)
-    local_backup_path = os.path.join(BACKUP_LOCAL_DIR, filename)
-
-    try:
-        os.makedirs(BACKUP_SHARED_DIR, exist_ok=True)
-        os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
-
-        with open(DATABASE_PATH, "rb") as src:
-            data = src.read()
-
-        with open(shared_backup_path, "wb") as f1:
-            f1.write(data)
-        with open(local_backup_path, "wb") as f2:
-            f2.write(data)
-
-        logger.info(f"✅ Backup successful: {filename}")
-        log_change("Backup created", f"{filename}")
-
-    except Exception as e:
-        logger.error(f"❌ Backup failed: {e}")
 
 
 @app.template_filter("datetimeformat")
