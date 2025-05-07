@@ -8,17 +8,7 @@
  * Restarting with stat
  * Debugger is active!
  * Debugger PIN: 536-586-427
-127.0.0.1 - - [06/May/2025 20:23:00] "[32mGET / HTTP/1.1[0m" 302 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /dashboard HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/style.css HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/boingo.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/riot_esports.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/riot_games.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/sparklight_(cableone).png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/umg.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/roblox.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/viasat.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "GET /static/logos/ziply.png HTTP/1.1" 200 -
-127.0.0.1 - - [06/May/2025 20:23:01] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-/Library/Frameworks/Python.framework/Versions/3.10/lib/python3.10/multiprocessing/resource_tracker.py:224: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
-  warnings.warn('resource_tracker: There appear to be %d '
+127.0.0.1 - - [06/May/2025 20:40:28] "GET /settings HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2025 20:40:28] "[36mGET /static/style.css HTTP/1.1[0m" 304 -
+127.0.0.1 - - [06/May/2025 20:40:35] "GET /settings HTTP/1.1" 200 -
+127.0.0.1 - - [06/May/2025 20:40:35] "[36mGET /static/style.css HTTP/1.1[0m" 304 -

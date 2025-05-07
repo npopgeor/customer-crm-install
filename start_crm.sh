@@ -41,12 +41,24 @@ fi
 
 # ✅ Step 7: Start Flask app in background
 echo "🚀 Starting CRM app in background..."
-nohup python3 app.py > crm_log.txt 2>&1 &
-sleep 2  # Give it time to initialize
 
-# Check if Flask is listening on port 5000
-if lsof -i :5000 | grep LISTEN > /dev/null; then
-  echo "✅ CRM app started successfully. Visit: http://localhost:5000"
+LOG_FILE="crm_log.txt"
+nohup python3 app.py > "$LOG_FILE" 2>&1 &
+APP_PID=$!
+sleep 2
+
+if ps -p $APP_PID > /dev/null; then
+  # Check for error in log
+  if grep -i "Traceback" "$LOG_FILE" > /dev/null; then
+    echo "❌ Error during startup! Here's the traceback:"
+    grep -A 10 -i "Traceback" "$LOG_FILE"
+    kill $APP_PID
+    exit 1
+  fi
+
+  echo "✅ CRM app started successfully with PID $APP_PID. Visit: http://localhost:5000"
 else
-  echo "❌ CRM app failed to start. Check crm_log.txt for errors."
+  echo "❌ CRM app failed to start. Process died immediately."
+  tail -n 20 "$LOG_FILE"
+  exit 1
 fi
