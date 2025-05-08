@@ -27,6 +27,7 @@ LOGO_UPLOAD_FOLDER = os.path.join(
 
 SQLALCHEMY_DATABASE_URI = f"sqlite:///{DATABASE_PATH}"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
+LOCK_FILE = os.path.join(ONEDRIVE_PATH, "APP", "db.lock")
 
 # === Heatmap columns ===
 COLUMNS = [

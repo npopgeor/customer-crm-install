@@ -8,7 +8,6 @@
     <div class="row g-2">
       <div class="col-md-4"><input name="link_text" class="form-control" placeholder="Link"></div>
       <div class="col-md-4"><input name="url" class="form-control" placeholder="URL" required></div>
-      <div class="col-md-4"><input name="others" class="form-control" placeholder="Other info"></div>
     </div>
     <button class="btn btn-primary mt-2">➕ Add</button>
   </form>
@@ -19,7 +18,6 @@
       <tr>
         <th>Link</th>
         <th>URL</th>
-        <th>Others</th>
         <th class="text-end">Actions</th>
       </tr>
     </thead>
@@ -28,7 +26,7 @@
       <tr>
         <td>{{ link.link_text }}</td>
         <td><a href="{{ link.url }}" target="_blank">{{ link.url }}</a></td>
-        <td>{{ link.others }}</td>
+ 
         <td class="text-end">
           <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editModal{{ link.id }}">✏️</button>
           <form method="POST" action="{{ url_for('delete_link', link_id=link.id) }}" style="display:inline;">
@@ -44,7 +42,6 @@
                   <div class="modal-body">
                     <input name="link_text" class="form-control mb-2" value="{{ link.link_text }}">
                     <input name="url" class="form-control mb-2" value="{{ link.url }}" required>
-                    <input name="others" class="form-control mb-2" value="{{ link.others }}">
                   </div>
                   <div class="modal-footer">
                     <button class="btn btn-primary">💾 Save</button>
