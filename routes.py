@@ -303,7 +303,7 @@ def add_contact():
             c.divisions = divisions_to_add
 
         db.session.commit()
-        log_change("Added contact", f"{c.name} – {c.email}")
+        log_change("Added contact", f"{c.name} – {c.contact_type}")
         return redirect(url_for("contact_list"))
     if is_locked():
         if not lock_expired():
@@ -406,7 +406,7 @@ def edit_contact(contact_id):
             contact.divisions = []  # Clear if no customer type
 
         db.session.commit()
-        log_change("Edited contact", f"{contact.name} – {contact.email}")
+        log_change("Edited contact", f"{contact.name} – {contact.contact_type}")
         return redirect(url_for("contact_list"))
 
     # === On GET: enforce locking ===
@@ -498,7 +498,7 @@ def delete_contact(contact_id):
     # Disassociate from meetings
     for meeting in contact.meetings:
         meeting.participants.remove(contact)
-    log_change("Deleted contact", f"{contact.name} – {contact.email}")
+    log_change("Deleted contact", f"{contact.name} – {contact.contact_type}")
     db.session.delete(contact)
     db.session.commit()
     return redirect(url_for("contact_list"))
@@ -515,6 +515,7 @@ def delete_all_contacts():
 
 @app.route("/contacts/export_csv")
 def export_contacts_csv():
+
     import csv
     from io import StringIO
 
@@ -564,10 +565,16 @@ def export_contacts_csv():
     output.write(si.getvalue().encode("utf-8"))
     output.seek(0)
 
-    return send_file(
-        output, mimetype="text/csv", as_attachment=True, download_name="contacts.csv"
-    )
+    filename = f"All_Contacts_{datetime.now().strftime('%Y-%m-%d')}.csv"
+    log_change("Exported all contacts", filename)
 
+
+    return send_file(
+        output,
+        mimetype="text/csv",
+        as_attachment=True,
+        download_name=filename
+    )
 
 @app.route("/contacts/import_csv", methods=["GET", "POST"])
 def import_contacts_csv():
@@ -644,6 +651,8 @@ def import_contacts_csv():
 
         # 💬 Print a report in terminal
         logger.info(f"✅ Imported {imported_count} contacts successfully.")
+        log_change("Imported contacts from CSV", f"{imported_count} added from file: {file.filename}")
+
         if skipped_rows:
             logger.warning("⚠️ Skipped rows:")
             for row_num, missing in skipped_rows:
@@ -1670,22 +1679,9 @@ def export_action_items_csv():
         ]
     )
 
-    # Fetch items
-    strategic_items = (
-        ActionItem.query.filter_by(category="strategic")
-        .order_by(ActionItem.date.desc())
-        .all()
-    )
-    daily_items = (
-        ActionItem.query.filter_by(category="daily")
-        .order_by(ActionItem.date.desc())
-        .all()
-    )
-
     # Helper to write rows
-    def write_items(items, category_label):
+    def write_items(items):
         for item in items:
-            # Combine detail + update into single text block
             detail_text = item.detail or ""
             if item.updates:
                 updates_combined = "\n\n".join(
@@ -1693,6 +1689,10 @@ def export_action_items_csv():
                     for u in item.updates
                 )
                 detail_text = f"{detail_text}\n\n--- Updates ---\n{updates_combined}"
+
+            category_label = "Strategic" if item.category == "strategic" else "Day-to-Day"
+            if item.completed:
+                category_label += " (Closed)"
 
             writer.writerow(
                 [
@@ -1706,24 +1706,31 @@ def export_action_items_csv():
                 ]
             )
 
-    # First Strategic
-    write_items(strategic_items, "Strategic")
+    # Fetch all items and sort by date descending
+    all_items = ActionItem.query.order_by(ActionItem.date.desc()).all()
 
-    # Then Daily
-    write_items(daily_items, "Day-to-Day")
+    # Filter into 4 groups
+    ordered_items = (
+        [i for i in all_items if i.category == "strategic" and not i.completed]
+        + [i for i in all_items if i.category == "daily" and not i.completed]
+        + [i for i in all_items if i.category == "strategic" and i.completed]
+        + [i for i in all_items if i.category == "daily" and i.completed]
+    )
 
-    # Prepare for download
+    write_items(ordered_items)
+
+    # Prepare the download
     output = si.getvalue().encode("utf-8")
     buffer = io.BytesIO(output)
     buffer.seek(0)
 
     today_str = date.today().isoformat()
     filename = f"action_items_export_{today_str}.csv"
+    log_change("Exported all action items", filename)
 
     return send_file(
         buffer, mimetype="text/csv", as_attachment=True, download_name=filename
     )
-
 
 # --- MEETINGS ROUTES ---
 # --- MEETINGS ROUTES ---
