@@ -11,6 +11,8 @@ from flask import (
     request,
     send_file,
     url_for,
+    flash,
+    session,
 )
 from icalendar import Calendar, Event
 from sqlalchemy.orm import joinedload
@@ -65,7 +67,12 @@ from utils import (
     sync_customer_files_logic,
     logger,
     CHANGE_LOG_FILE,
-    get_last_backup_times,
+    get_last_backup_times, 
+    acquire_lock, 
+    release_lock, 
+    is_locked, 
+    lock_info, 
+    lock_expired,
 )
 
 
@@ -1327,7 +1334,12 @@ def action_item_list():
 
 @app.route("/action_items/add", methods=["GET", "POST"])
 def add_action_item():
+    print("=== ENTERED ADD ROUTE ===")
     if request.method == "POST":
+        print("🚪 POST: Releasing lock")
+        # 🔓 Release the lock after successful submission
+        release_lock()
+
         item = ActionItem(
             date=request.form["date"],
             detail=request.form["detail"],
@@ -1344,13 +1356,34 @@ def add_action_item():
         )
         return redirect(url_for("action_item_list", tab=item.category))
 
+   # ✅ On GET: check and enforce locking
+    print("🔐 is_locked():", is_locked())
+    print("⏳ lock_expired():", lock_expired())
+    print("📄 lock_info():", lock_info())
+    if is_locked():
+        if not lock_expired():
+            print("❌ Denying access: lock is active and valid.")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("action_item_list"))
+        else:
+            print("⚠️ Lock expired, releasing...")
+            flash(f"⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    # ✅ Now try to acquire it freshly
+    if not acquire_lock():
+        print("🛑 Could not acquire lock, someone may have just beaten us to it.")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("action_item_list"))
+    
+    print("✅ Lock acquired. Showing form.")
+    # Lock acquired; proceed to show form
     customers = Customer.query.all()
     return render_template(
         "add_action_item.html",
         customers=customers,
         current_date=date.today().isoformat(),
     )
-
 
 @app.route("/action_items/delete/<int:item_id>")
 def delete_action_item(item_id):
@@ -1979,6 +2012,11 @@ def inject_meetings_today():
     return dict(meetings_today=meetings_today)
 
 
+
+@app.context_processor
+def inject_lock_status():
+    return dict(is_locked=is_locked)
+
 # ------------------ DASHBOARD ROUTES ---------------------
 
 
@@ -2217,3 +2255,15 @@ def delete_link(link_id):
     db.session.delete(link)
     db.session.commit()
     return redirect(url_for('links'))
+
+
+# UNLOCK ROUTE
+
+
+@app.route("/unlock", methods=["POST"])
+def unlock():
+    if session.get("owns_lock"):
+        release_lock()
+        return "", 204  # Success
+    print("⚠️ Unlock blocked: session does not own the lock")
+    return "", 403  # Forbidden

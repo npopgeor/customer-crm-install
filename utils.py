@@ -3,6 +3,10 @@ from logging.handlers import RotatingFileHandler
 import os
 from threading import Thread
 from datetime import datetime
+from flask import session
+
+import time
+import getpass
 
 
 
@@ -14,7 +18,8 @@ from config import (
     ONEDRIVE_PATH,
     BACKUP_SHARED_DIR,
     BACKUP_LOCAL_DIR,
-    DATABASE_PATH
+    DATABASE_PATH,
+    LOCK_FILE,
 
 )
 from extensions import db
@@ -288,3 +293,45 @@ logger.addHandler(file_handler)
 
 def log_change(action: str, target: str):
     logger.info(f"[{DEVICE_NAME}] {action} → {target}")
+
+
+
+# 🔒 Lock file path — make sure this is inside the shared OneDrive folder
+
+def acquire_lock():
+    if os.path.exists(LOCK_FILE):
+        return False
+    with open(LOCK_FILE, "w") as f:
+        f.write(f"{getpass.getuser()} at {datetime.now()}")
+    session["owns_lock"] = True  # ✅ Store ownership
+    return True
+
+def release_lock():
+    if os.path.exists(LOCK_FILE):
+        os.remove(LOCK_FILE)
+    session.pop("owns_lock", None)  # ✅ Clear ownership
+
+
+def is_locked():
+    """
+    Check if lock file exists.
+    """
+    return os.path.exists(LOCK_FILE)
+
+def lock_info():
+    """
+    Return contents of the lock file, or None if not locked.
+    """
+    if not os.path.exists(LOCK_FILE):
+        return None
+    with open(LOCK_FILE, "r") as f:
+        return f.read().strip()
+
+def lock_expired(timeout_sec=20):
+    """
+    Check if the lock file is older than the timeout (default: 10 minutes).
+    """
+    if not os.path.exists(LOCK_FILE):
+        return False
+    age = time.time() - os.path.getmtime(LOCK_FILE)
+    return age > timeout_sec
