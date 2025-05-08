@@ -422,3 +422,20 @@ def get_new_files_today_count(DISCOVERY_ROOT, SKIP_FOLDERS):
     except Exception as e:
         logger.warning(f"⚠️ File scan failed during {scan_window or 'unknown'} window: {e}")
         return file_scan_cache["count"]  # fallback to last known value
+
+
+
+# Path to fallback DB: most recent file from BACKUP_LOCAL_DIR
+def get_latest_local_backup():
+    try:
+        backups = [
+            os.path.join(BACKUP_LOCAL_DIR, f)
+            for f in os.listdir(BACKUP_LOCAL_DIR)
+            if f.endswith(".db")
+        ]
+        if not backups:
+            return None
+        return max(backups, key=os.path.getmtime)
+    except Exception as e:
+        print("❌ Failed to locate local backup:", e)
+        return None

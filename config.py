@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 # === Load environment variables from .env ===
 load_dotenv()
 
+# === Offline mode defaults ===
+OFFLINE_MODE = False
+
 # === Environment-derived constants ===
 DEVICE_NAME = os.environ.get("DEVICE_NAME", "UNKNOWN_DEVICE")
 ONEDRIVE_PATH = os.environ.get("ONEDRIVE_PATH")
