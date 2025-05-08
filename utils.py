@@ -327,9 +327,9 @@ def lock_info():
     with open(LOCK_FILE, "r") as f:
         return f.read().strip()
 
-def lock_expired(timeout_sec=20):
+def lock_expired(timeout_sec=300):
     """
-    Check if the lock file is older than the timeout (default: 10 minutes).
+    Check if the lock file is older than the timeout (default: 5 minutes).
     """
     if not os.path.exists(LOCK_FILE):
         return False

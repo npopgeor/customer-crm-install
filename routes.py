@@ -255,6 +255,8 @@ def view_contact(contact_id):
 @app.route("/contacts/add", methods=["GET", "POST"])
 def add_contact():
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         c = Contact(
             name=request.form["name"],
             email=request.form["email"],
@@ -279,7 +281,22 @@ def add_contact():
         db.session.commit()
         log_change("Added contact", f"{c.name} – {c.email}")
         return redirect(url_for("contact_list"))
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("contact_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("contact_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
     # 👇 Keep everything below the same
     def serialize_contact(contact):
         return {
@@ -342,6 +359,8 @@ def edit_contact(contact_id):
     all_contacts = Contact.query.filter(Contact.id != contact.id).all()
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         contact.name = request.form["name"]
         contact.email = request.form["email"]
         contact.phone = request.form.get("phone")
@@ -366,6 +385,24 @@ def edit_contact(contact_id):
         log_change("Edited contact", f"{contact.name} – {contact.email}")
         return redirect(url_for("contact_list"))
 
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("contact_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("contact_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
+    
     def serialize_contact(c):
         return {
             "id": c.id,
@@ -605,6 +642,8 @@ def add_partner():
     customers = Customer.query.order_by(Customer.name).all()
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         partner = Partner(name=request.form["name"], notes=request.form.get("notes"))
 
         customer_ids = request.form.getlist("customer_ids")
@@ -620,7 +659,23 @@ def add_partner():
         if request.args.get("from") == "settings":
             return redirect(url_for("settings", tab="partners"))
         return redirect(url_for("partner_list"))
+# === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("partner_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("partner_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
     return render_template("add_partner.html", customers=customers)
 
 
@@ -630,6 +685,8 @@ def edit_partner(partner_id):
     customers = Customer.query.order_by(Customer.name).all()
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         partner.name = request.form["name"]
         partner.notes = request.form.get("notes")
 
@@ -643,7 +700,23 @@ def edit_partner(partner_id):
         if request.args.get("from") == "settings":
             return redirect(url_for("settings", tab="partners"))
         return redirect(url_for("partner_list"))
+# === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("partner_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("partner_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
     return render_template("edit_partner.html", partner=partner, customers=customers)
 
 
@@ -739,6 +812,8 @@ def customer_detail(id):
 @app.route("/customers/add", methods=["GET", "POST"])
 def add_customer():
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         customer_name = request.form["name"]
         customer = Customer(
             name=customer_name,
@@ -788,7 +863,24 @@ def add_customer():
         if request.args.get("from") == "settings":
             return redirect(url_for("settings", tab="customers"))
         return redirect(url_for("customer_list"))
+    
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("customer_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("customer_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
     contacts = Contact.query.filter(
         Contact.customer_id == None, Contact.partner_id == None
     ).all()
@@ -801,6 +893,8 @@ def edit_customer(id):
     customer = Customer.query.get_or_404(id)
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         customer.name = request.form["name"]
         customer.cx_services = request.form.get("cx_services")
         customer.notes = request.form.get("notes")
@@ -817,7 +911,23 @@ def edit_customer(id):
         db.session.commit()
 
         return redirect(url_for("customer_detail", id=customer.id))
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("customer_detail", id=customer.id))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("customer_detail", id=customer.id))
+
+    logger.debug("✅ Lock acquired — showing form")
     return render_template(
         "edit_customer.html", customer=customer, available_contacts=Contact.query.all()
     )
@@ -1334,9 +1444,7 @@ def action_item_list():
 
 @app.route("/action_items/add", methods=["GET", "POST"])
 def add_action_item():
-    print("=== ENTERED ADD ROUTE ===")
     if request.method == "POST":
-        print("🚪 POST: Releasing lock")
         # 🔓 Release the lock after successful submission
         release_lock()
 
@@ -1357,26 +1465,19 @@ def add_action_item():
         return redirect(url_for("action_item_list", tab=item.category))
 
    # ✅ On GET: check and enforce locking
-    print("🔐 is_locked():", is_locked())
-    print("⏳ lock_expired():", lock_expired())
-    print("📄 lock_info():", lock_info())
     if is_locked():
         if not lock_expired():
-            print("❌ Denying access: lock is active and valid.")
             flash(f"🚫 Locked: {lock_info()}", "danger")
             return redirect(url_for("action_item_list"))
         else:
-            print("⚠️ Lock expired, releasing...")
             flash(f"⚠️ Lock expired. Releasing stale lock...", "warning")
             release_lock()
 
     # ✅ Now try to acquire it freshly
     if not acquire_lock():
-        print("🛑 Could not acquire lock, someone may have just beaten us to it.")
         flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
         return redirect(url_for("action_item_list"))
     
-    print("✅ Lock acquired. Showing form.")
     # Lock acquired; proceed to show form
     customers = Customer.query.all()
     return render_template(
@@ -1403,6 +1504,8 @@ def edit_action_item(item_id):
     tab = request.args.get("tab", "daily")  # ← Capture tab from query string
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         item.date = request.form["date"]
         item.detail = request.form["detail"]
         item.customer_id = request.form["customer_id"]
@@ -1419,7 +1522,24 @@ def edit_action_item(item_id):
 
         # Redirect to correct tab based on (possibly updated) category
         return redirect(url_for("action_item_list", tab=item.category))
+    
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("action_item_list", tab=item.category))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("action_item_list", tab=item.category))
+
+    logger.debug("✅ Lock acquired — showing form")
     customers = Customer.query.all()
     return render_template(
         "edit_action_item.html", item=item, customers=customers, active_tab=tab
@@ -1605,6 +1725,8 @@ def redirect_back(fallback_endpoint=None, fallback_kwargs=None):
 @app.route("/meetings/add", methods=["GET", "POST"])
 def add_meeting():
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         meeting = Meeting(
             customer_id=request.form["customer_id"],
             date=request.form["date"],
@@ -1623,6 +1745,24 @@ def add_meeting():
             f"{meeting.title} for {meeting.customer.name} on {meeting.date}",
         )
         return redirect_back(fallback_endpoint="meeting_list")  # 👈 updated
+    
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("meeting_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("meeting_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
 
     customers = Customer.query.all()
     contacts = Contact.query.all()
@@ -1646,6 +1786,8 @@ def edit_meeting(meeting_id):
     customers = Customer.query.order_by(Customer.name).all()  # ⬅️ Needed for dropdown
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         meeting.date = request.form["date"]
         meeting.title = request.form["title"]
         meeting.host = request.form["host"]
@@ -1659,6 +1801,24 @@ def edit_meeting(meeting_id):
             f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}",
         )
         return redirect(url_for("meeting_list"))
+
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("meeting_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("meeting_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
 
     return render_template("edit_meeting.html", meeting=meeting, customers=customers)
 
@@ -1746,6 +1906,8 @@ def ordinal(n):
 @app.route("/recurring_meetings/add", methods=["GET", "POST"])
 def add_recurring_meeting():
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         title = request.form["title"]
         start_datetime = datetime.strptime(
             request.form["start_datetime"], "%Y-%m-%dT%H:%M"
@@ -1815,8 +1977,26 @@ def add_recurring_meeting():
             )
 
         return redirect(url_for("recurring_meeting_list"))
+    
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("recurring_meeting_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
 
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("recurring_meeting_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
     customers = Customer.query.all()
+
     return render_template("add_recurring_meeting.html", customers=customers)
 
 
@@ -1825,6 +2005,8 @@ def edit_recurring_meeting(meeting_id):
     meeting = RecurringMeeting.query.get_or_404(meeting_id)
 
     if request.method == "POST":
+        logger.debug("📤 POST request — releasing lock")
+        release_lock()
         meeting.start_datetime = datetime.strptime(
             request.form["start_datetime"], "%Y-%m-%dT%H:%M"
         )
@@ -1846,6 +2028,24 @@ def edit_recurring_meeting(meeting_id):
             f"{meeting.title} (ID: {meeting.id}) for {meeting.customer.name}",
         )
         return redirect(url_for("recurring_meeting_list"))
+    
+    # === On GET: enforce locking ===
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("recurring_meeting_list"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("recurring_meeting_list"))
+
+    logger.debug("✅ Lock acquired — showing form")
 
     customers = Customer.query.all()
     return render_template(
@@ -2010,7 +2210,6 @@ def inject_meetings_today():
             meetings_today.append(meeting)
 
     return dict(meetings_today=meetings_today)
-
 
 
 @app.context_processor
@@ -2230,6 +2429,22 @@ def links():
 
 @app.route('/add-link', methods=['POST'])
 def add_link():
+    logger.debug("📤 add-link POST — attempting to acquire lock")
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access to add-link")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("links"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock for add-link")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock for add-link")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("links"))
+
     link_text = request.form.get('link_text')
     url = request.form.get('url')
     others = request.form.get('others')
@@ -2238,16 +2453,39 @@ def add_link():
         new_link = Link(link_text=link_text, url=url, others=others)
         db.session.add(new_link)
         db.session.commit()
+        log_change("Added link", f"{link_text} → {url}")
+    
+    release_lock()
     return redirect(url_for('links'))
 
 @app.route('/edit-link/<int:link_id>', methods=['POST'])
 def edit_link(link_id):
+    logger.debug("📤 edit-link POST — attempting to acquire lock")
+    if is_locked():
+        if not lock_expired():
+            logger.info("🚫 Lock active — denying access to edit-link")
+            flash(f"🚫 Locked: {lock_info()}", "danger")
+            return redirect(url_for("links"))
+        else:
+            logger.info("⚠️ Lock expired — releasing stale lock for edit-link")
+            flash("⚠️ Lock expired. Releasing stale lock...", "warning")
+            release_lock()
+
+    if not acquire_lock():
+        logger.warning("🛑 Failed to acquire lock for edit-link")
+        flash("⚠️ Could not acquire lock. Another user may have just opened it.", "danger")
+        return redirect(url_for("links"))
+
     link = Link.query.get_or_404(link_id)
     link.link_text = request.form.get('link_text')
     link.url = request.form.get('url')
     link.others = request.form.get('others')
     db.session.commit()
+    log_change("Edited link", f"{link.link_text} → {link.url}")
+    
+    release_lock()
     return redirect(url_for('links'))
+
 
 @app.route('/delete-link/<int:link_id>', methods=['POST'])
 def delete_link(link_id):
@@ -2265,5 +2503,5 @@ def unlock():
     if session.get("owns_lock"):
         release_lock()
         return "", 204  # Success
-    print("⚠️ Unlock blocked: session does not own the lock")
+    logger.info("⚠️ Unlock blocked: session does not own the lock")
     return "", 403  # Forbidden
