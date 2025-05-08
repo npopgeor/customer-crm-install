@@ -73,6 +73,8 @@ from utils import (
     is_locked, 
     lock_info, 
     lock_expired,
+    get_new_files_today_count,
+    file_scan_cache,
 )
 
 
@@ -194,6 +196,8 @@ from datetime import datetime
 def all_files_by_customer():
     grouped_files = {}
     all_files = []
+    today = date.today()
+    new_files_today = []
 
     for root, _, files in os.walk(DISCOVERY_ROOT):
         if any(skip in root for skip in SKIP_FOLDERS):
@@ -204,27 +208,47 @@ def all_files_by_customer():
             full_path = os.path.join(root, file)
             rel_path = os.path.relpath(full_path, DISCOVERY_ROOT)
             mod_time = os.path.getmtime(full_path)
-            all_files.append(
-                {
-                    "path": rel_path,
-                    "timestamp": mod_time,
-                    "date": datetime.fromtimestamp(mod_time).strftime("%Y-%m-%d %H:%M"),
-                }
-            )
+            mod_dt = datetime.fromtimestamp(mod_time)
 
-            # Build tree
+            if mod_dt.date() == today:
+                new_files_today.append(rel_path)
+
+            all_files.append({
+                "path": rel_path,
+                "timestamp": mod_time,
+                "date": mod_dt.strftime("%Y-%m-%d %H:%M")
+            })
+
+            # Build folder tree
             parts = rel_path.split("/")
             current = grouped_files
             for part in parts[:-1]:
                 current = current.setdefault(part, {})
             current[parts[-1]] = rel_path
 
+    # ✅ Update file_scan_cache with latest real-time scan result
+    now = datetime.now()
+    file_scan_cache.update({
+        "date": today,
+        "count": len(new_files_today),
+    })
+    logger.info(f"📁 /files triggered real scan at {now.strftime('%H:%M')} — {len(new_files_today)} new files found.")
+
+    # ✅ Respect your scanning window logic
+    if 11 <= now.hour < 16:
+        file_scan_cache["scanned_11"] = True
+    elif 16 <= now.hour <= 23:
+        file_scan_cache["scanned_16"] = True
+    # NOTE: if before 11, don't mark either flag
+
     recent_files = sorted(all_files, key=lambda x: x["timestamp"], reverse=True)[:5]
 
     return render_template(
-        "all_files.html", grouped_files=grouped_files, recent_files=recent_files
+        "all_files.html",
+        grouped_files=grouped_files,
+        recent_files=recent_files,
+        new_files_today=new_files_today
     )
-
 
 @app.route("/sync_all_files", methods=["POST"])
 def sync_all_files():
@@ -2157,12 +2181,12 @@ def backup_db():
             f2.write(data)
 
         log_change(f"[{DEVICE_NAME}] Manual backup", f"{filename}")
-        return redirect(url_for("dashboard", msg="✅ Backup saved to OneDrive + Mac!"))
+        return redirect(url_for("settings", msg="✅ Backup saved to OneDrive + Mac!"))
 
     except Exception as e:
         logger.error(f"❌ Manual backup failed: {e}")
         return redirect(
-            url_for("dashboard", msg="❌ Backup failed. Check server logs.")
+            url_for("settings", msg="❌ Backup failed. Check server logs.")
         )
 
 
@@ -2238,6 +2262,13 @@ def inject_meetings_today():
 @app.context_processor
 def inject_lock_status():
     return dict(is_locked=is_locked)
+
+
+@app.context_processor
+def inject_new_file_count():
+    from config import DISCOVERY_ROOT, SKIP_FOLDERS
+    return dict(new_files_today_count=get_new_files_today_count(DISCOVERY_ROOT, SKIP_FOLDERS))
+
 
 # ------------------ DASHBOARD ROUTES ---------------------
 

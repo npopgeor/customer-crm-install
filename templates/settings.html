@@ -22,6 +22,16 @@
 <h2 class="mb-4">⚙️ Settings</h2>
 
 
+{% if request.args.get('msg') %}
+<div class="alert alert-info">{{ request.args.get('msg') }}</div>
+{% endif %}
+
+
+<div class="d-flex justify-content-end align-items-center mb-4">
+  <a href="{{ url_for('backup_db') }}" class="btn btn-sm btn-outline-secondary">
+    ⬇️ Backup Database
+  </a>
+</div>
 
 {% if request.args.get('msg') == 'confirm_failed' %}
   <div class="alert alert-warning">❌ Confirmation failed. Entry not deleted.</div>

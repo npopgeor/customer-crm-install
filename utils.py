@@ -206,11 +206,23 @@ def scan_and_index_files():
 
 def daily_backup_if_needed():
     today = datetime.now().strftime("%Y%m%d")
-    files = os.listdir(BACKUP_SHARED_DIR)
-    found = any(f.startswith(f"account_team_{today}") for f in files)
 
-    if not found:
-        Thread(target=backup_db_internal).start()
+    if not os.path.exists(BACKUP_SHARED_DIR):
+        logger.warning(f"🚫 Backup skipped — shared backup folder not accessible: {BACKUP_SHARED_DIR}")
+        return
+
+    try:
+        files = os.listdir(BACKUP_SHARED_DIR)
+        found = any(f.startswith(f"account_team_{today}") for f in files)
+
+        if not found:
+            logger.info("📦 No backup found for today. Starting one now...")
+            Thread(target=backup_db_internal).start()
+        else:
+            logger.debug("✅ Daily backup already exists. No action needed.")
+
+    except Exception as e:
+        logger.warning(f"⚠️ Failed to check or create daily backup: {e}")
 
 
 def backup_db_internal():
@@ -277,23 +289,29 @@ def get_last_backup_times():
         return {"shared": None, "local": None}
 
 
-
-# === Logging setup ===
+#= Logging setup ===
 CHANGE_LOG_FILE = os.path.join(ONEDRIVE_PATH, "APP", "change_log.txt")
-
+log_dir = os.path.dirname(CHANGE_LOG_FILE)
 
 logger = logging.getLogger("crm_logger")
 logger.setLevel(logging.INFO)
 
-# 📦 Rotating file handler: max ~1MB per file, keep last 5
-file_handler = RotatingFileHandler(CHANGE_LOG_FILE, maxBytes=1_000_000, backupCount=5)
-file_handler.setFormatter(logging.Formatter("%(asctime)s — %(message)s"))
-logger.addHandler(file_handler)
+if os.path.exists(log_dir):
+    # 📦 Rotating file handler: max ~1MB per file, keep last 5
+    file_handler = RotatingFileHandler(CHANGE_LOG_FILE, maxBytes=1_000_000, backupCount=5)
+    file_handler.setFormatter(logging.Formatter("%(asctime)s — %(message)s"))
+    logger.addHandler(file_handler)
+    logger.info("📝 File logging initialized.")
+else:
+    # Fallback: optionally just log to console or do nothing
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logging.Formatter("%(asctime)s — %(message)s"))
+    logger.addHandler(console_handler)
+    logger.warning(f"🚫 Logging to file skipped — OneDrive log path missing: {log_dir}")
 
-
+# === Logging call ===
 def log_change(action: str, target: str):
     logger.info(f"[{DEVICE_NAME}] {action} → {target}")
-
 
 
 # 🔒 Lock file path — make sure this is inside the shared OneDrive folder
@@ -335,3 +353,72 @@ def lock_expired(timeout_sec=300):
         return False
     age = time.time() - os.path.getmtime(LOCK_FILE)
     return age > timeout_sec
+
+# ----- SCAN FILES TWICE A DAY
+file_scan_cache = {
+    "date": None,
+    "scanned_11": False,
+    "scanned_16": False,
+    "count": 0
+}
+
+def get_new_files_today_count(DISCOVERY_ROOT, SKIP_FOLDERS):
+    now = datetime.now()
+    today = now.date()
+    hour = now.hour
+
+    # Reset at midnight
+    if file_scan_cache["date"] != today:
+        logger.info("🕛 New day detected. Resetting file scan cache.")
+        file_scan_cache.update({
+            "date": today,
+            "scanned_11": False,
+            "scanned_16": False,
+            "count": 0
+        })
+
+    # Determine if we are in a scan window
+    should_scan = False
+    scan_window = None
+
+    if 11 <= hour < 16 and not file_scan_cache["scanned_11"]:
+        should_scan = True
+        scan_window = "11AM"
+    elif 16 <= hour <= 23 and not file_scan_cache["scanned_16"]:
+        should_scan = True
+        scan_window = "4PM"
+
+    if not should_scan:
+        return file_scan_cache["count"]
+
+    # ✅ Perform scan
+    try:
+        count = 0
+        for root, _, files in os.walk(DISCOVERY_ROOT):
+            if any(skip in root for skip in SKIP_FOLDERS):
+                continue
+            for file in files:
+                if file.startswith("."):
+                    continue
+                full_path = os.path.join(root, file)
+                try:
+                    mod_time = os.path.getmtime(full_path)
+                    if datetime.fromtimestamp(mod_time).date() == today:
+                        count += 1
+                except FileNotFoundError:
+                    continue
+
+        file_scan_cache["count"] = count
+
+        # ✅ Now mark the appropriate scan window as completed
+        if scan_window == "11AM":
+            file_scan_cache["scanned_11"] = True
+        elif scan_window == "4PM":
+            file_scan_cache["scanned_16"] = True
+
+        logger.info(f"📂 File scan completed at {scan_window}: {count} new files found.")
+        return count
+
+    except Exception as e:
+        logger.warning(f"⚠️ File scan failed during {scan_window or 'unknown'} window: {e}")
+        return file_scan_cache["count"]  # fallback to last known value

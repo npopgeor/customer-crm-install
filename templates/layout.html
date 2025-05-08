@@ -32,6 +32,7 @@
         <span class="badge bg-danger text-white">{{ action_item_open_count }}</span>
       {% endif %}
     </a>
+
     <a class="nav-link badge-right" href="{{ url_for('recurring_meeting_list') }}">
       🔁 Recurring Meetings
       {% if meetings_today|length > 0 %}
@@ -56,8 +57,11 @@
         <!-- 🔻 Divider -->
         <hr class="my-4">
 
-    <a class="nav-link" href="{{ url_for('all_files_by_customer') }}">
+    <a class="nav-link badge-right" href="{{ url_for('all_files_by_customer') }}">
       📁 View All Files
+      {% if new_files_today_count > 0 %}
+        <span class="badge bg-success ms-2">{{ new_files_today_count }} new</span>
+      {% endif %}
     </a>
 
     <a class="nav-link" href="{{ url_for('links') }}">
