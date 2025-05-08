@@ -688,8 +688,9 @@ def customer_list():
 
 def build_contact_tree(contacts):
     id_map = {c.id: c for c in contacts}
-    tree = []
+    report_counts = {c.id: 0 for c in contacts}
 
+    # Step 1: Build subordinates and count direct reports
     for contact in contacts:
         manager_id = contact.reports_to
         if manager_id and manager_id in id_map:
@@ -697,9 +698,31 @@ def build_contact_tree(contacts):
             if not hasattr(manager, "subordinates"):
                 manager.subordinates = []
             manager.subordinates.append(contact)
-        else:
+            report_counts[manager_id] += 1
+
+    # Step 2: Recursive function to count all descendants (subtree size)
+    def count_descendants(contact):
+        if not hasattr(contact, "subordinates"):
+            return 0
+        return len(contact.subordinates) + sum(count_descendants(sub) for sub in contact.subordinates)
+
+    # Step 3: Identify top-level contacts (no manager)
+    tree = []
+    for contact in contacts:
+        manager_id = contact.reports_to
+        if not manager_id:
             tree.append(contact)
-    return tree
+
+    # Step 4: Separate disconnected contacts
+    connected = [c for c in tree if hasattr(c, "subordinates")]
+    disconnected = [c for c in tree if not hasattr(c, "subordinates")]
+
+    # Step 5: Sort by total size of reporting tree (then alphabetically)
+    connected.sort(key=lambda c: (-count_descendants(c), c.name.lower()))
+    disconnected.sort(key=lambda c: c.name.lower())
+
+    return connected + disconnected
+
 
 
 @app.route("/customer/<int:id>")
