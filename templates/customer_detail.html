@@ -38,102 +38,151 @@
     </p>
   {% endif %}
 
-  {% if customer.opportunities %}
-    <p><strong>Opportunities:</strong>
-      {% for opp in customer.opportunities %}
-        {{ opp.title }} ({{ opp.stage }}){% if not loop.last %}, {% endif %}
-      {% endfor %}
-    </p>
-  {% endif %}
+  <!-- 🧭 Tab Navigation -->
+  <ul class="nav nav-tabs mt-4" id="customerTabs" role="tablist">
+    <li class="nav-item">
+      <button class="nav-link active" id="contacts-tab" data-bs-toggle="tab" data-bs-target="#contacts" type="button">👥 Contacts</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="opps-tab" data-bs-toggle="tab" data-bs-target="#opportunities" type="button">💼 Opportunities</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="discounts-tab" data-bs-toggle="tab" data-bs-target="#discounts" type="button">📉 Discounts</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="projects-tab" data-bs-toggle="tab" data-bs-target="#projects" type="button">🛠 Projects</button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link" id="attachments-tab" data-bs-toggle="tab" data-bs-target="#attachments" type="button">📎 Attachments</button>
+    </li>
+  </ul>
 
-  {% if customer.technologies %}
-    <p><strong>Technologies:</strong>
-      {% for tech in customer.technologies %}
-        {{ tech.name }} – {{ tech.discount_level }}%{% if not loop.last %}, {% endif %}
-      {% endfor %}
-    </p>
-  {% endif %}
+  <!-- ✨ Tab Contents -->
+  <div class="tab-content mt-3" id="customerTabContent">
 
-  {% if customer.projects %}
-    <p><strong>Projects:</strong>
-      {% for proj in customer.projects %}
-        {{ proj.name }} ({{ proj.status }}){% if not loop.last %}, {% endif %}
-      {% endfor %}
-    </p>
-  {% endif %}
+    <!-- 👥 Contacts Tab -->
+    <div class="tab-pane show active" id="contacts" role="tabpanel">
+      {% if contact_tree %}
+        <ul class="tree">
+          {% for contact in contact_tree if not contact.reports_to %}
+            {{ render_tree(contact, []) }}
+          {% endfor %}
+        </ul>
+      {% else %}
+        <p class="text-muted">No contacts available.</p>
+      {% endif %}
+    </div>
 
-  <!-- Contacts Section -->
-  <div class="mt-4">
-    <div class="card p-3">
-      <a class="d-flex justify-content-between align-items-center text-decoration-none text-dark"
-         data-bs-toggle="collapse"
-         href="#contactCollapse"
-         role="button"
-         aria-expanded="false"
-         aria-controls="contactCollapse">
-        <h5 class="mb-0">👥 Contacts</h5>
-        <span class="text-primary small">Show/Hide</span>
-      </a>
-      <div class="collapse" id="contactCollapse">
-        <div class="mt-3">
-          {% if contact_tree %}
-            <ul class="tree">
-              {% for contact in contact_tree if not contact.reports_to %}
-                {{ render_tree(contact, []) }}
-              {% endfor %}
-            </ul>
-          {% else %}
-            <p class="text-muted">No contacts available.</p>
-          {% endif %}
+    <!-- 💼 Opportunities Tab -->
+    <div class="tab-pane" id="opportunities" role="tabpanel">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5>Opportunities</h5>
+        <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addOpportunityModal">➕ Add Opportunity</button>
+      </div>
+
+      {% if customer.opportunities %}
+      <ul class="list-group">
+        {% for opp in customer.opportunities %}
+        <li class="list-group-item">
+          <div class="d-flex justify-content-between align-items-start">
+            <div>
+              <strong>{{ opp.title }}</strong> – {{ opp.stage or 'No stage' }}
+              {% if opp.value %}<span class="badge bg-primary ms-2">${{ opp.value }}</span>{% endif %}<br>
+              <small class="text-muted">Created: {{ opp.date_added.strftime('%b %d, %Y') if opp.date_added else '—' }}</small><br>
+              <small class="text-muted">{{ opp.notes or '—' }}</small>
+              {% if opp.next_steps %}
+              <div><strong>Next steps:</strong> <small class="text-muted">{{ opp.next_steps }}</small></div>
+              {% endif %}
+            </div>
+            <div class="btn-group btn-group-sm">
+              <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#editOpportunityModal{{ opp.id }}">✏️</button>
+              <form method="POST" action="{{ url_for('delete_opportunity', opp_id=opp.id) }}" onsubmit="return confirm('Delete this opportunity?')">
+                <button class="btn btn-outline-danger">🗑️</button>
+              </form>
+            </div>
+          </div>
+        </li>
+
+        <!-- 📝 Edit Modal -->
+        <div class="modal fade" id="editOpportunityModal{{ opp.id }}" tabindex="-1">
+          <div class="modal-dialog">
+            <form method="POST" action="{{ url_for('edit_opportunity', opp_id=opp.id) }}">
+              <div class="modal-content">
+                <div class="modal-header"><h5 class="modal-title">Edit Opportunity</h5></div>
+                <div class="modal-body">
+                  <label class="form-label">Title</label>
+                  <input name="title" class="form-control mb-2" value="{{ opp.title }}" placeholder="Technology or Title" required>
+                  <label class="form-label">Stage</label>
+                  <input name="stage" class="form-control mb-2" value="{{ opp.stage }}" placeholder="Stage (e.g. Identified, POC)">
+                  <label class="form-label">Value</label>
+                  <input name="value" class="form-control mb-2" value="{{ opp.value }}" placeholder="Potential Value ($)">
+                  <label class="form-label">Notes</label>
+                  <textarea name="notes" class="form-control mb-2" rows="3" placeholder="Notes or context...">{{ opp.notes }}</textarea>
+                  <label class="form-label">Next Steps</label>
+                  <textarea name="next_steps" class="form-control mb-2" rows="2" placeholder="Next Steps...">{{ opp.next_steps }}</textarea>
+                  <small class="text-muted">Last updated: {{ opp.last_updated.strftime('%b %d, %Y') if opp.last_updated else '—' }}</small>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn btn-primary">💾 Save</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="text-muted">No opportunities added yet.</p>
+      {% endif %}
+    </div>
+
+    <!-- ➕ Add Opportunity Modal -->
+    <div class="modal fade" id="addOpportunityModal" tabindex="-1">
+      <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('add_customer_opportunity', customer_id=customer.id) }}">
+          <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Add New Opportunity</h5></div>
+            <div class="modal-body">
+              <label class="form-label">Title</label>
+              <input name="title" class="form-control mb-2" placeholder="Technology or Title" required>
+              <label class="form-label">Stage</label>
+              <input name="stage" class="form-control mb-2" placeholder="Stage (e.g. Identified, POC)">
+              <label class="form-label">Value</label>
+              <input name="value" class="form-control mb-2" placeholder="Potential Value ($)">
+              <label class="form-label">Notes</label>
+              <textarea name="notes" class="form-control mb-2" rows="2" placeholder="Notes or context..."></textarea>
+              <label class="form-label">Next Steps</label>
+              <textarea name="next_steps" class="form-control" rows="2" placeholder="Next Steps..."></textarea>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary">💾 Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">❌ Cancel</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>
-
-  <!-- Attachments Block -->
-
-
-  <div class="row mt-4">
-    <div class="col-md-6 col-xl-4">
-      <div class="card p-3 h-100" style="cursor: pointer;" onclick="window.location='{{ url_for('customer_attachments', id=customer.id) }}'">
-        <div class="d-flex justify-content-between align-items-center mb-3">
-          <h5 class="mb-0">📎 Attachments</h5>
-          <small class="text-primary">View & Manage ➔</small>
-        </div>
-        {% if total_attachments > 0 %}
-          <p class="mb-0">
-            <span class="fw-bold fs-4 text-primary">{{ total_attachments }}</span>
-            attachment{{ 's' if total_attachments > 1 else '' }} uploaded
-          </p>
-        {% else %}
-          <p class="text-muted mb-0">No attachments uploaded yet.</p>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-  
-
 </div>
 
-
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    document.addEventListener("keydown", function (event) {
-      if ((event.key === "Escape" || event.keyCode === 27) &&
-          document.activeElement.tagName !== "TEXTAREA" &&
-          document.activeElement.tagName !== "INPUT") {
-        
-        event.preventDefault(); // Prevent default Escape behavior (like modal close)
-        console.log("Forced redirect on Esc");
-
-        setTimeout(() => {
-          window.location.href = "/dashboard";  // ✅ Change this per page
-        }, 100);
-      }
+    document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("keydown", function (event) {
+        if ((event.key === "Escape" || event.keyCode === 27) &&
+            document.activeElement.tagName !== "TEXTAREA" &&
+            document.activeElement.tagName !== "INPUT") {
+          
+          event.preventDefault(); // Prevent default Escape behavior (like modal close)
+          console.log("Forced redirect on Esc");
+  
+          setTimeout(() => {
+            window.location.href = "/dashboard";  // ✅ Change this per page
+          }, 100);
+        }
+      });
     });
-  });
-</script>
-
-
+  </script>
+  
 
 {% endblock %}

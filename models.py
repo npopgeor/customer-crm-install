@@ -37,6 +37,11 @@ meeting_participants = db.Table(
     db.Column("contact_id", db.Integer, db.ForeignKey("contact.id")),
 )
 
+opportunity_contacts = db.Table(
+    'opportunity_contacts',
+    db.Column('opportunity_id', db.Integer, db.ForeignKey('customer_opportunity.id')),
+    db.Column('contact_id', db.Integer, db.ForeignKey('contact.id'))
+)
 
 # --------------------- MODELS ---------------------
 
@@ -271,12 +276,21 @@ class DivisionProject(db.Model):
 
 
 class CustomerOpportunity(db.Model):
+    __tablename__ = 'customer_opportunity'
+
     id = db.Column(db.Integer, primary_key=True)
     customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"), nullable=False)
+
     title = db.Column(db.String(200), nullable=False)
-    value = db.Column(db.String(100))
     stage = db.Column(db.String(100))
+    value = db.Column(db.String(100))
     notes = db.Column(db.Text)
+    next_steps = db.Column(db.Text)
+
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    contacts = db.relationship('Contact', secondary=opportunity_contacts, backref='opportunities')
 
 
 class CustomerTechnology(db.Model):

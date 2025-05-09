@@ -7,25 +7,36 @@
       <label class="form-label">Date</label>
       <input type="date" name="date" value="{{ meeting.date }}" class="form-control" required>
     </div>
-    <select name="customer_id" class="form-select">
-      {% for customer in customers %}
-        <option value="{{ customer.id }}" {% if customer.id == meeting.customer_id %}selected{% endif %}>
-          {{ customer.name }}
-        </option>
-      {% endfor %}
-    </select>
+
+
     <div class="mb-3">
       <label class="form-label">Title</label>
       <input name="title" value="{{ meeting.title }}" class="form-control" required>
     </div>
+
+    <div class="mb-3">
+      <label class="form-label">Notes</label>
+      <textarea name="notes" class="form-control" rows="7">{{ meeting.notes }}</textarea>
+    </div>
+
+    <div class="mb-3">
+
+      <label class="form-label">Customer <span class="text-danger">*</span></label>
+      <select name="customer_id" class="form-select">
+        {% for customer in customers %}
+          <option value="{{ customer.id }}" {% if customer.id == meeting.customer_id %}selected{% endif %}>
+            {{ customer.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    
     <div class="mb-3">
       <label class="form-label">Host</label>
       <input name="host" value="{{ meeting.host }}" class="form-control">
     </div>
-    <div class="mb-3">
-      <label class="form-label">Notes</label>
-      <textarea name="notes" class="form-control">{{ meeting.notes }}</textarea>
-    </div>
+
+  
     <button class="btn btn-primary">Update Meeting</button>
   </form>
   <a href="/meetings" class="btn btn-link mt-3">⬅ Back to Meetings</a>

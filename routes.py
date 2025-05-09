@@ -1092,14 +1092,49 @@ def add_customer_opportunity(customer_id):
     value = request.form.get("value")
     stage = request.form.get("stage")
     notes = request.form.get("notes")
+    next_steps = request.form.get("next_steps")
 
     new_opp = CustomerOpportunity(
-        customer_id=customer.id, title=title, value=value, stage=stage, notes=notes
+        customer_id=customer.id,
+        title=title,
+        value=value,
+        stage=stage,
+        notes=notes,
+        next_steps=next_steps,
+        last_updated=datetime.now()
     )
     db.session.add(new_opp)
     log_change("Added customer opportunity", title)
     db.session.commit()
     return redirect(url_for("customer_detail", id=customer.id))
+
+@app.route("/customers/opportunities/<int:opp_id>/edit", methods=["POST"])
+def edit_opportunity(opp_id):
+    opp = CustomerOpportunity.query.get_or_404(opp_id)
+
+    opp.title = request.form["title"]
+    opp.stage = request.form.get("stage")
+    opp.value = request.form.get("value")
+    opp.notes = request.form.get("notes")
+    opp.next_steps = request.form.get("next_steps")
+    opp.last_updated = datetime.now()
+
+    db.session.commit()
+    log_change("Edited customer opportunity", f"{opp.title} (ID: {opp.id})")
+
+    return redirect(url_for("customer_detail", id=opp.customer_id))
+
+@app.route("/customers/opportunities/<int:opp_id>/delete", methods=["POST"])
+def delete_opportunity(opp_id):
+    opp = CustomerOpportunity.query.get_or_404(opp_id)
+    customer_id = opp.customer_id
+    title = opp.title
+
+    db.session.delete(opp)
+    db.session.commit()
+    log_change("Deleted customer opportunity", f"{title} (ID: {opp.id})")
+
+    return redirect(url_for("customer_detail", id=customer_id))
 
 
 # --- Customer Technologies ---
@@ -1788,10 +1823,6 @@ def add_meeting():
             host=request.form["host"],
             notes=request.form.get("notes"),
         )
-        participant_ids = request.form.getlist("participants")
-        for cid in participant_ids:
-            contact = Contact.query.get(int(cid))
-            meeting.participants.append(contact)
         db.session.add(meeting)
         db.session.commit()
         log_change(
