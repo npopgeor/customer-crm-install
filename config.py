@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # === Environment-derived constants ===
-DEVICE_NAME = os.environ.get("DEVICE_NAME", "UNKNOWN_DEVICE")
+#DEVICE_NAME = os.environ.get("DEVICE_NAME", "UNKNOWN_DEVICE")
 ONEDRIVE_PATH = os.environ.get("ONEDRIVE_PATH")
 DATABASE_PATH = os.environ.get("DATABASE_PATH")
 
@@ -47,3 +47,8 @@ COLUMNS = [
 os.makedirs(LOGO_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(BACKUP_LOCAL_DIR, exist_ok=True)
+
+USERS = {
+    "nik": "cisco123",
+    "gary": "cxrocks",
+}

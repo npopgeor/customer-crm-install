@@ -8,10 +8,7 @@ from flask import session
 import time
 import getpass
 
-
-
 from config import (
-    DEVICE_NAME,
     DISCOVERY_ROOT,
     SKIP_FOLDERS,
     UPLOAD_FOLDER,
@@ -311,7 +308,7 @@ else:
 
 # === Logging call ===
 def log_change(action: str, target: str):
-    logger.info(f"[{DEVICE_NAME}] {action} → {target}")
+    logger.info(f"[{get_device_name()}] {action} → {target}")
 
 
 # 🔒 Lock file path — make sure this is inside the shared OneDrive folder
@@ -422,3 +419,6 @@ def get_new_files_today_count(DISCOVERY_ROOT, SKIP_FOLDERS):
     except Exception as e:
         logger.warning(f"⚠️ File scan failed during {scan_window or 'unknown'} window: {e}")
         return file_scan_cache["count"]  # fallback to last known value
+
+def get_device_name():
+    return session.get("username", "UNKNOWN_USER")

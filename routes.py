@@ -30,9 +30,9 @@ from config import (
     BACKUP_SHARED_DIR,
     COLUMNS,
     DATABASE_PATH,
-    DEVICE_NAME,
     DISCOVERY_ROOT,
     SKIP_FOLDERS,
+    USERS,
 
 )
 from extensions import db
@@ -80,6 +80,20 @@ from utils import (
 
 # --------------------- ROUTES ---------------------
 
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"].strip().lower()
+        password = request.form["password"]
+
+        if USERS.get(username) == password:
+            session["username"] = username.strip().capitalize()
+            return redirect(url_for("dashboard"))  # or wherever
+        else:
+            flash("❌ Invalid username or password", "danger")
+            return redirect(url_for("login"))
+
+    return render_template("login.html")
 
 @app.route("/")
 def home():
@@ -2218,7 +2232,7 @@ def backup_db():
         with open(local_backup_path, "wb") as f2:
             f2.write(data)
 
-        log_change(f"[{DEVICE_NAME}] Manual backup", f"{filename}")
+        log_change("Manual backup", filename)
         return redirect(url_for("settings", msg="✅ Backup saved to OneDrive + Mac!"))
 
     except Exception as e:
@@ -2495,6 +2509,7 @@ def settings():
     try:
         with open(CHANGE_LOG_FILE, "r") as f:
             lines = f.readlines()
+            #filtered_lines = lines
             filtered_lines = [line for line in lines if "Nik" in line or "Gary" in line]
             log_content = "".join(reversed(filtered_lines[-200:]))  # Show last 200 matching lines
     except Exception as e:

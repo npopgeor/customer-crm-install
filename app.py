@@ -6,6 +6,9 @@ from datetime import datetime
 from flask import (
     Flask,
     request,
+    session,
+    redirect,
+    url_for,
 )
 
 from config import (
@@ -17,8 +20,6 @@ from extensions import db
 from utils import (
     daily_backup_if_needed
 )
-
-
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "fallback_dev_secret")
@@ -41,6 +42,10 @@ def maybe_run_daily_backup():
         g.backup_checked = True  # Avoid running multiple times in one request cycle
         daily_backup_if_needed()
 
+@app.before_request
+def require_login():
+    if request.endpoint not in ("login", "static") and "username" not in session:
+        return redirect(url_for("login"))
 
 from routes import *
 
